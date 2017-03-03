@@ -45,7 +45,6 @@ function cancelReveal(req,res){
     var secondUserID = req.query.secondUser;
     var secondUserOptions = {};
     secondUserOptions.select = 'revealReceived';
-    
     var firstUserOptions = {};
     firstUserOptions.select = 'revealRequested';
      User.findById(firstUserID,firstUserOptions).then(function(firstUser){
