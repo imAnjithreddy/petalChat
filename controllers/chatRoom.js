@@ -22,6 +22,8 @@ function createOrFindChatRoom(firstUserID,secondUserID,callBack){
             var chatRoom = new ChatRoom();
             chatRoom.creator1 = creator1;
             chatRoom.creator2 = creator2;
+            
+            
             chatRoom.save().then(function(savedChatRoom){
                 callBack(savedChatRoom);
             });
@@ -30,12 +32,17 @@ function createOrFindChatRoom(firstUserID,secondUserID,callBack){
 
 
 function getChatRoom(req,res){
-    createOrFindChatRoom(req.query.secondUser,req.query.firstUser,function(chatRoom){
-        
-    });
     createOrFindChatRoom(req.query.firstUser,req.query.secondUser,function(chatRoom){
-        res.json(chatRoom);
+        
+        if(!chatRoom.chats){
+            createOrFindChatRoom(req.query.secondUser,req.query.firstUser,function(chatRoom){
+        
+            });
+        }
+        res.json(chatRoom);        
     });
+    
+    
     
 }
 
@@ -43,6 +50,8 @@ function userChatRooms(req, res) {
         var creator = req.params.creatorId;
         var queryObj = {};
         var options = {};
+        queryObj.creator1 = creator ;
+        queryObj.revealed = req.query.revealed;
         options.limit = req.query.limit ? parseInt(req.query.limit) : 20;
         options.sort = req.query.sort ||{
         lastMessageTime: -1 //Sort by Date Added DESC
@@ -53,8 +62,7 @@ function userChatRooms(req, res) {
                             { path: 'lastMessage', model: 'Chat', select: 'message ' },
                             { path: 'creator2', model: 'User', select: 'anonName picture' }
         ];
-        queryObj.creator1 = creator ;
-        queryObj.revealed = req.query.revealed;
+        
         ChatRoom.paginate(queryObj, options).then(function(chatRooms) {
             res.json(chatRooms);
             

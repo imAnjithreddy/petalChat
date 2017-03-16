@@ -1,14 +1,18 @@
 var userModel = require("..//models/user");
 var chatModel = require('..//models/chat');
+var chatRoomModel = require('..//models/chatRoom');
 var User = userModel.User;
 var Chat = chatModel.Chat;
+var ChatRoom = chatRoomModel.Chat;
+
+
 var chatController = {
     
 }
 
 function getChats(req, res) {
         var queryObj = {};
-        if (req.query.chatchatRoomID) {
+        if (req.query.chatRoomID) {
             queryObj.chatRoom = req.query.chatchatRoomID;
         }
         var options ={};
@@ -25,65 +29,67 @@ function getChats(req, res) {
             
     }
     
+/*
 
+ * create two chats.
+ * save both the chats
+ * find chatrroms for both users
+ * save lastmessage in both the chatrooms
+ * populate a chat
+ * send to the socket io
+*/
 function createChat(req, res) {
         var chat = new Chat();
         var chat2 = new Chat();
         var recData = req.body;
         var io = req.io;
+        var receiver = recData.receiver;
         chat.user = recData.user;
+        chat.type = recData.type;
+        chat2.type = chat.type;
         chat.chatRoom = req.query.chatRoomID;
         chat.message = recData.message;
         chat2.user = recData.user;
-        
         chat2.message = recData.message;
-        
-        chat.save(function(err, savedMessage) {
-            if (err) {
-                if (err.code == 11000) {
-                    return res.json({ success: false, 'message': 'Chat already exists' });
-                } else {
-                    console.log(err);
-                    return res.send(err);
-                }
-            }
-            ChatRoom.findById(chat.chatRoom).exec(function(err, chatRoom) {
-                if (err) {
-                    console.log(err);
-                } else {
-                    
-                    ChatRoom.find({creator1: chatRoom.creator2,creator2: chatRoom.creator1}).then(function(chatRoom2){
-                        chat2.chatRoom = chatRoom2._id;
-                        chatRoom2.lastMessage = savedMessage;
-                        chatRoom2.lastMessageTime = savedMessage.time;
-                        chatRoom2.save();
-                        chat2.save();
-                    })
-                    
-                    
-                    chatRoom.lastMessage = savedMessage;
-                    chatRoom.lastMessageTime = savedMessage.time;
-                    chatRoom.save(function(err) {
-                        if (err) {
-                            console.log(err);
-                        }
-                        Chat.populate(savedMessage, { path: "user", select: chatRoom.revealed?'displayName picture':'anonName picture' }, function(err, popMessage) {
-                            console.log("the saved message");
-                            console.log(savedMessage);
-                            io.to(req.query.chatRoomID).emit('messageSaved', popMessage);
-                            io.to(chatRoom.creator1).emit('newMessageReceived', popMessage);
-                            io.to(chatRoom.creator2).emit('newMessageReceived', popMessage);
-                            res.json({ message: "Chat createdess" });
-                        });
-
-                    });
-                }
+        chat.save().then(function(savedMessage) {
+            saveChatRoom({_id:chat.chatRoom},savedMessage);
+            saveChatRoom({creator1: receiver,creator2: chat.user},savedMessage,function(savedChatRoom){
+                chat2.chatRoom = savedChatRoom._id;
+                chat2.save();
+                sendMessage(req,res,savedMessage,chat.chatRoom,chat.receiver,savedChatRoom._id);    
             });
+            
+        });
+}
 
+
+function saveChatRoom(queryObj,message,callback){
+    ChatRoom.find(queryObj).then(function(chatRoom){
+        chatRoom.lastMessage = message;
+        chatRoom.lastMessageTime = message.time;
+        chatRoom.save().then(function(chatRoom){
+            if(callback){
+                callback(chatRoom);    
+            }
+            
         });
     });
 }
 
+function sendMessage(req,res,message,senderRoom,receiverID,receiverRoom){
+    Chat.populate(message, { path: "user", select: 'anonName picture'}, function(err, popMessage) {
+        if(err){
+            console.log(err);
+            return res.send(err);
+        }
+        console.log("the saved message");
+        console.log(message);
+        req.io.to(senderRoom).emit('messageSaved', popMessage);
+        req.io.to(receiverRoom).emit('messageReceived',popMessage);
+        req.io.to(receiverID).emit('newMessageReceived', popMessage);
+        res.json({ message: "Chat created" });
+    });
+}
     
     
     

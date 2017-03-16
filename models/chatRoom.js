@@ -5,7 +5,7 @@ var URLSlugs = require('mongoose-url-slugs');
 var mongoosePaginate = require('mongoose-paginate');
 var relationship = require("mongoose-relationship"); //Refer https://www.npmjs.com/package/mongoose-relationship
 var Schema = mongoose.Schema;
-var urlStrings = require('../routes/url.js');
+
 //var connectionString = "mongodb://shopdb:shopdb1234@ds029476.mlab.com:29476/shopdb";
 //var connectionString  = "mongodb://shop_dir:shop_dir@ds023912.mlab.com:23912/shoppins";
 
@@ -19,5 +19,6 @@ var ChatRoomSchema = new Schema({
 
 });
 ChatRoomSchema.index({ creator1: 1, creator2: 1 }, { unique: true });
+ChatRoomSchema.plugin(mongoosePaginate);
 var ChatRoom = mongoose.model("ChatRoom", ChatRoomSchema);
 exports.ChatRoom = ChatRoom;

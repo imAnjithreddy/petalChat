@@ -7,14 +7,13 @@
   "author": "Mostafa Eweda <mo.eweda@gmail.com>",
   "dependencies": {
     "async": "~0.2.8",
-    "express": "~3.2.4",
-    "socket.io": "~0.9.14",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.15.1",
     "cloudinary": "^1.4.6",
     "compression": "^1.6.2",
     "connect-multiparty": "^2.0.0",
     "cors": "^2.8.1",
+    "express": "^4.15.2",
     "jsonwebtoken": "^6.2.0",
     "jwt-simple": "^0.5.0",
     "moment": "^2.13.0",
@@ -25,7 +24,18 @@
     "morgan": "^1.7.0",
     "multer": "^1.2.1",
     "querystring": "^0.2.0",
-    "request": "^2.72.0"
-    
+    "request": "^2.72.0",
+    "socket.io": "~0.9.14"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-http": "^3.0.0",
+    "mocha": "^3.2.0",
+    "node-mocks-http": "^1.6.1",
+    "should": "^11.2.1",
+    "supertest": "^3.0.0"
+  },
+  "scripts": {
+    "test": "node_modules/.bin/mocha -w"
   }
 }
