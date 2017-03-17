@@ -100,6 +100,9 @@ function generateUserObj(item){
   if(user.anonName){
     user.anonName = item.anonName;
   }
+  if(user.latitude && user.longitude){
+    user.loc = [item.longitude,item.latitude];  
+  }
   return user;
 
 

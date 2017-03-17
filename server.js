@@ -27,7 +27,7 @@ var port = process.env.PORT || 3000;
 
 
 app.use(cors());
-
+var cityRouter = require('./routes/city');
 var chatRouter = require('./routes/chatRoute');
 var postRouter = require('./routes/postRoute');
 var userRouter = require('./routes/userRoute');
@@ -41,6 +41,8 @@ app.set('port', process.env.PORT || 3000);
 
 
 app.use('/user',userRouter);
+app.use('/city',cityRouter);
+app.use('/post',postRouter);
 app.use(express.static(__dirname + '/public'));
 app.use(function(req, res, next) {
     req.io = io;
