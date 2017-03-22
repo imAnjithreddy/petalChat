@@ -16,48 +16,45 @@ var postController = {
 function getPosts(req,res){
         var queryObj = {};
         var options = {};
-        options.limit = req.query.limit ? parseInt(req.query.limit) : null;
+        options.limit = req.query.limit ? parseInt(req.query.limit) : 20;
         options.sort = req.query.sort || null;
-        options.page = req.query.page || null;
-        if(req.query.rating){
-          /*add code to sort by rating*/
-        }
-        if(req.query.interest){
-          queryObj.interest = req.query.interest;
-        }
+        options.page = req.query.page || 1;
+        
         if(req.query.user){
           queryObj.user = req.query.user;
         }
         if(req.query.nearby){
-			let maxDistance = req.query.distance || 8;
-			maxDistance /= 6371;
-			queryObj.loc={
-				$near: [req.query.longitude,req.query.latitude],
-				$maxDistance: maxDistance
-			};
-		}
+    			let maxDistance = req.query.distance*100;
+    			maxDistance /= 6371;
+    			queryObj.loc={
+    				$near: [req.query.longitude,req.query.latitude],
+    				$maxDistance: maxDistance
+    			};
+		    }
         
-        options.populate = [{ path: 'user', model: 'User', select: 'anonName picture' }];
+        options.populate = { path: 'user', model: 'User', select: 'anonName picture status' };
         
         Post.paginate(queryObj, options).then(function(postList) {
             res.json(postList);
         });
         
 }
-function generatePostObj(item){
+function generatePostObj(user,item){
   var post = new Post();
 
   if(item.content){
     post.content = item.content;  
   }
-  if(item.user){
-    post.user = item.user;  
-  }
+  
+  post.user = user;  
+  
   if(item.latitude && item.longitude){
     post.loc = [item.longitude,item.latitude];  
   }
-  if(item.interests){
-    post.interests = item.interests;  
+  if(item.interest){
+    post.interests = item.interest.split('!');
+    post.interests.splice(0,1);
+    post.interests = post.interests.map((interest)=>interest.trim());
   }
   
   return post;
@@ -67,7 +64,9 @@ function generatePostObj(item){
 }
 function createPost(req, res) {
   
-  var post = generatePostObj(req.body.post);
+  var post = generatePostObj(req.user,req.body.post);
+  console.log("form the post");
+  console.log(post);
   post.save(function(error, result) {
     if (error) {
       console.log("error" + error);
@@ -81,8 +80,7 @@ function createPost(req, res) {
 }
 
 function getPost(req, res) {
-  Post.findById(req.params.postId)
-    .select(req.query.select)
+  Post.findById(req.params.id)
     .exec(function(error, result) {
       if (error) {
         console.log("error while reading");
@@ -120,7 +118,7 @@ function deletePost(req, res) {
       console.log(err);
     }
     else {
-
+      res.json({"message":"Post has been deleted"});
     }
   });
 }

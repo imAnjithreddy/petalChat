@@ -11,21 +11,24 @@ var UserSchema = new Schema({
 	"status": String,
 	"bio": String,
 	"interest": [String],
-	'verified': Boolean,
-	'email': { type: String, unique: true },
 	"password": String,
 	"facebook": String,
+	"google": String,
+	'googleName': String,
+	'googlePicture': String,
+	'facebookName': String,
+	'facebookPicture': String,
 	"picture": { type: String, default: 'https://cdn3.iconfinder.com/data/icons/black-easy/512/538303-user_512x512.png' },
 	"displayName": String,
 	"revealedPicture": String,
 	"anonName": String,
-	"description": String,
 	"loc": {
     	type: [Number],  // [<longitude>, <latitude>]
     	index: '2d'      // create the geospatial index
     },
-	"revealRequested": [{ type: Schema.ObjectId, ref: "User" }],
-	"revealReceived": [{ type: Schema.ObjectId, ref: "User" }],
+    "upvotes": [{ type: Schema.ObjectId, ref: "Upvote"}],
+	"requested": [{ type: Schema.ObjectId, ref: "User" }],
+	"received": [{ type: Schema.ObjectId, ref: "User" }],
 	"revealed":[{ type: Schema.ObjectId, ref: "User" }],
 	"posts": [{ type: Schema.ObjectId, ref: "Post" }]
 

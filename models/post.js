@@ -14,7 +14,9 @@ var PostSchema = new Schema({
 	loc: {
     		type: [Number],  // [<longitude>, <latitude>]
     		index: '2d'      // create the geospatial index
-    	}
+    	},
+    upvotes: [{ type: Schema.ObjectId, ref: "Upvote"}],
+    upvotesLength: Number
 });
 
 PostSchema.plugin(relationship, { relationshipPathName: 'user' });

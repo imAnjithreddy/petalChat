@@ -15,7 +15,7 @@ var ChatRoomSchema = new Schema({
 	chats: [{ type: Schema.ObjectId, ref: "Chat" }],
 	lastMessage: { type: Schema.ObjectId, ref: "Chat" },
 	lastMessageTime: { type: Date },
-	'revealed': Boolean
+	revealed: {type:Boolean, default: false}
 
 });
 ChatRoomSchema.index({ creator1: 1, creator2: 1 }, { unique: true });

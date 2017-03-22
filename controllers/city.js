@@ -16,9 +16,8 @@ function getCity(req,res){
         options.limit = req.query.limit ? parseInt(req.query.limit) : null;
         options.sort = req.query.sort || null;
         options.page = req.query.page || null;
-        options.sort = 'distance';
+        //options.sort = 'distance';
         if(req.query.nearby){
-          console.log(req.query.distance);
     			let maxDistance = req.query.distance*100;
     			maxDistance /= 6371;
     			queryObj.loc={

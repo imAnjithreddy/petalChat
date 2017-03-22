@@ -2,7 +2,10 @@ var models = require('..//models/user');
 var chatRoomController = require("./chatRoom");
 var User = models.User;
 var revealController = {
-    
+    initiateReveal: initiateReveal,
+    cancelReveal: cancelReveal,
+    acceptReveal: acceptReveal,
+    ignoreReveal: ignoreReveal
 };
 
 module.exports = revealController;

@@ -16,9 +16,6 @@ var cors = require('cors');
 mongoose.Promise = global.Promise;
 
 var config = require('./config');
-
-  console.log("the environment");
-  console.log(app.settings.env);
   app.set('dbUrl', config.db[app.settings.env]);
   // connect mongoose to the mongo dbUrl
   mongoose.connect(app.get('dbUrl'));
@@ -28,9 +25,13 @@ var port = process.env.PORT || 3000;
 
 app.use(cors());
 var cityRouter = require('./routes/city');
+var upvoteRouter = require('./routes/upvoteRoute');
 var chatRouter = require('./routes/chatRoute');
+var chatRoomRouter = require('./routes/chatRoomRoute');
+var authenticateRouter = require('./routes/authRoute');
 var postRouter = require('./routes/postRoute');
 var userRouter = require('./routes/userRoute');
+var revealRouter = require('./routes/revealRoute');
 
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
@@ -41,6 +42,9 @@ app.set('port', process.env.PORT || 3000);
 
 
 app.use('/user',userRouter);
+app.use('/upvote',upvoteRouter);
+app.use('/reveal',revealRouter);
+app.use('/authenticate',authenticateRouter);
 app.use('/city',cityRouter);
 app.use('/post',postRouter);
 app.use(express.static(__dirname + '/public'));
@@ -49,9 +53,7 @@ app.use(function(req, res, next) {
     next();
 });
 app.use('/chat', chatRouter);
-app.get('*', function (req, res) {
-        res.sendFile(__dirname + '/public/index.html'); 
-});
+app.use('/chatRoom', chatRoomRouter);
 
 
 io.on('connection', function(socket) {
@@ -72,8 +74,7 @@ io.on('connection', function(socket) {
     });
 });
 server.listen(app.get('port'), function() {
-        console.log("Listening");
-        console.log(__dirname);
+        
     });
     
     
