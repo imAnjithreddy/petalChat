@@ -2,19 +2,29 @@ var models = require('..//models/user');
 var chatRoomController = require("./chatRoom");
 var User = models.User;
 var revealController = {
-    initiateReveal: initiateReveal,
-    cancelReveal: cancelReveal,
-    acceptReveal: acceptReveal,
-    ignoreReveal: ignoreReveal
+    initiate: initiate,
+    cancel: cancel,
+    accept: accept,
+    ignore: ignore,
+    revealed: revealed,
+    requested: requested,
+    received: received,
+    finish: finish
 };
 
 module.exports = revealController;
 
 
-function initiateReveal(req,res){
-    var firstUserID = req.query.firstUser;
+function initiate(req,res){
+    var firstUserID = req.user;
     var secondUserID = req.query.secondUser;
-    var secondUserOptions = {};
+    User.friendRequest(firstUserID,secondUserID,function(err,request){
+        if(err){
+            return res.json(err);
+        }
+         res.json({"message":"Request sent. Number of Requests left"});
+    });
+/*    var secondUserOptions = {};
     secondUserOptions.select = 'revealReceived';
     
     var firstUserOptions = {};
@@ -40,13 +50,19 @@ function initiateReveal(req,res){
                 }
             }
         });
-    });
+    }); */
 }
 
-function cancelReveal(req,res){
-    var firstUserID = req.query.firstUser;
+function cancel(req,res){
+    var firstUserID = req.user;
     var secondUserID = req.query.secondUser;
-    var secondUserOptions = {};
+    User.cancelRequest(firstUserID,secondUserID,function(err,request){
+        if(err){
+            return res.json(err);
+        }
+        res.json({"message":"Request Cancelled.Number of Requests left"});
+    });
+/*    var secondUserOptions = {};
     secondUserOptions.select = 'revealReceived';
     var firstUserOptions = {};
     firstUserOptions.select = 'revealRequested';
@@ -81,16 +97,33 @@ function cancelReveal(req,res){
             }
         });
     });
-    
+  */  
 }
 
-function acceptReveal(req,res){
+function accept(req,res){
     /*firstUser is the one who initated the request,
         second user is going to accept it.
     */
-    var firstUserID = req.query.firstUser;
+    var firstUserID = req.user;
     var secondUserID = req.query.secondUser;
-    
+    User.acceptRequest(firstUserID,secondUserID,function(err,request){
+        if(err){
+            return res.json(err);
+        }
+        chatRoomController.createOrFindChatRoom(secondUserID,firstUserID,function(chatRoom){
+            chatRoom.revealed = true;
+            chatRoom.save();
+        });
+        
+        chatRoomController.createOrFindChatRoom(firstUserID,secondUserID,function(chatRoom){
+            chatRoom.revealed = true;
+            chatRoom.save().then(function(){
+            
+            });
+        });
+        res.json({"message":"Request Accepted."});
+    });
+    /*
     var firstUserOptions = {};
     firstUserOptions.select = 'revealRequested revealed';
     
@@ -139,19 +172,35 @@ function acceptReveal(req,res){
         });
     });
     
-    
+    */
 }
 
-function ignoreReveal(req,res){
-    cancelReveal(req,res);
+function ignore(req,res){
+    var firstUserID = req.user;
+    var secondUserID = req.query.secondUser;
+    User.denyRequest(firstUserID,secondUserID,function(err,request){
+        if(err){
+            return res.json(err);
+        }
+        res.json({"message":"Request Denied!"});
+    });
 }
 
-function getRevealRequests(req,res){
+function requested(req,res){
        /*firstUser is the one who initated the request,
         second user is going to accept it.
     */
-    var firstUserID = req.query.firstUser;
-    var firstUserOptions = {};
+    //var firstUserID = req.query.firstUser;
+    var firstUserID = req.user;
+    //var secondUserID = req.query.secondUser;
+    User.getSentRequests(firstUserID,function(err,request){
+        if(err){
+            return res.json(err);
+        }
+        //restrict the field access 
+        res.json(request);
+    });
+    /*var firstUserOptions = {};
     firstUserOptions.select = 'revealRequested';
     var queryObj = {};
     var options = {};
@@ -165,11 +214,20 @@ function getRevealRequests(req,res){
             res.json(revealedList);
         });
     });
+    */
 }
 
-function getRevealReceives(req,res){
-    var firstUserID = req.query.firstUser;
-    var firstUserOptions = {};
+function received(req,res){
+    //var firstUserID = req.query.firstUser;
+    var firstUserID = req.user;
+    //var secondUserID = req.query.secondUser;
+    User.getReceivedRequests(firstUserID,function(err,request){
+        if(err){
+            return res.json(err);
+        }
+        res.json(request);
+    });
+  /*  var firstUserOptions = {};
     firstUserOptions.select = 'revealReceived';
     var queryObj = {};
     var options = {};
@@ -183,10 +241,19 @@ function getRevealReceives(req,res){
             res.json(revealedList);
         });
     });
+    */
 }
 
-function getReveals(req,res){
-    var firstUserID = req.query.firstUser;
+function revealed(req,res){
+    var firstUserID = req.user;
+    //var secondUserID = req.query.secondUser;
+    User.getFriends(firstUserID,function(err,request){
+        if(err){
+            return res.json(err);
+        }
+        res.json(request);
+    });
+    /*var firstUserID = req.query.firstUser;
     var firstUserOptions = {};
     firstUserOptions.select = 'revealed';
     var queryObj = {};
@@ -201,6 +268,7 @@ function getReveals(req,res){
             res.json(revealedList);
         });
     });
+    */
 }
 
 /*
@@ -208,5 +276,28 @@ $or: [
           { $and: [{creator1: req.query.firstUser}, {creator2: { $in: firstUser.revealed}}] },
           { $and: [{creator2: req.query.firstUser}, {creator1: { $in: firstUser.revealed}}] }
       ]*/
+      
+function finish(req,res){
+    var firstUserID = req.user;
+    var secondUserID = req.query.secondUser;
+    User.endFriendship(firstUserID,secondUserID,function(err,request){
+        if(err){
+            return res.json(err);
+        }
+           chatRoomController.createOrFindChatRoom(secondUserID,firstUserID,function(chatRoom){
+            chatRoom.revealed = false;
+            chatRoom.save();
+        });
+        
+        chatRoomController.createOrFindChatRoom(firstUserID,secondUserID,function(chatRoom){
+            chatRoom.revealed = false;
+            chatRoom.save().then(function(){
+            
+            });
+        });
+         res.json({"message":"Finished Friendship!"});
+    });
+}
+module.exports = revealController;
 
 

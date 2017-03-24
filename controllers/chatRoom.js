@@ -4,7 +4,8 @@ var User = userModel.User;
 var ChatRoom = chatModel.ChatRoom;
 var chatRoomController = {
     getChatRoom: getChatRoom,
-    getChatRooms: getChatRooms
+    getChatRooms: getChatRooms,
+    createOrFindChatRoom: createOrFindChatRoom
 };
 
 function createOrFindChatRoom(firstUserID,secondUserID,callBack){
@@ -19,9 +20,6 @@ function createOrFindChatRoom(firstUserID,secondUserID,callBack){
         ChatRoom.findOne(queryObj).then(function(chatRoom){
             callBack(chatRoom);
         }).catch(function(){
-            console.log("from chatroom 22");
-    console.log(creator1);
-    console.log(creator2);
             var chatRoom = new ChatRoom();
             chatRoom.creator1 = creator1;
             chatRoom.creator2 = creator2;
