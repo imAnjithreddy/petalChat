@@ -26,6 +26,7 @@ function getChats(req, res) {
         };
         options.page = req.query.page || 1;
         ChatRoom.findById(queryObj.chatRoom).select('revealed').then(function(chatRoom){
+            console.log("revealed type "+typeof chatRoom.revealed);
             if(chatRoom.revealed){
                 selectString = 'displayName revealedPicture';
             }
