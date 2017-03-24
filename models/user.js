@@ -1,9 +1,18 @@
 'use strict';
+var defaults = {
+    // define the name for your Users model.
+    personModelName:            'User',
+    // define the name for the Friendship model
+    friendshipModelName:        'Friendship',
+    // define the name of the Friendship collection.
+    friendshipCollectionName:   undefined
+}
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt-nodejs');
 var URLSlugs = require('mongoose-url-slugs');
 var mongoosePaginate = require('mongoose-paginate');
 var relationship = require("mongoose-relationship"); //Refer https://www.npmjs.com/package/mongoose-relationship
+var FriendsOfFriends = require('friends-of-friends')(mongoose,defaults);
 var Schema = mongoose.Schema;
 var UserSchema = new Schema({
 	"firstName": String,
@@ -55,6 +64,7 @@ UserSchema.pre('save', function(next) {
 		next();
 	});
 });
+UserSchema.plugin(FriendsOfFriends.plugin,defaults);
 try{
 	exports.User = mongoose.model('User', UserSchema);
 }
