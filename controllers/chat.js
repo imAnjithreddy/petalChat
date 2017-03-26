@@ -20,9 +20,9 @@ function getChats(req, res) {
         queryObj.chatRoom = req.params.roomID;
         
         var options ={};
-        options.limit = req.query.limit ? parseInt(req.query.limit) : 50;
+        options.limit = 20;//req.query.limit ? parseInt(req.query.limit) : 50;
         options.sort = {
-            time: 1
+            time: -1
         };
         options.page = req.query.page || 1;
         ChatRoom.findById(queryObj.chatRoom).select('revealed').then(function(chatRoom){
@@ -71,9 +71,9 @@ function createChat(req, res) {
             
             saveChatRoom({creator1: receiver,creator2: req.user},savedMessage,function(savedChatRoom){
                 
-                console.log("the chat from 74");
+                
                 chat2.chatRoom = savedChatRoom._id;
-                console.log(chat2);
+                
                 chat2.save();
                 sendMessage(req,res,savedMessage,chat.chatRoom,chat.receiver,savedChatRoom);    
             });
@@ -89,7 +89,18 @@ function saveChatRoom(queryObj,message,callback){
         if(err1){
             console.log("err 89");
             console.log(err1);
+            //return res.send({"message":err1});
         }
+        /* 
+            *For situation when one user has deleted his side of chatbox. 
+            *If the second user sends a message then a new chatbox should be created
+        */
+        
+        if(!chatRoom){
+            chatRoom = new ChatRoom();
+        }
+        console.log("saving message");
+        console.log(message);
         chatRoom.lastMessage = message;
         chatRoom.lastMessageTime = message.time;
         chatRoom.save(function(err,chatRoomSaved){
@@ -113,13 +124,13 @@ function sendMessage(req,res,message,senderRoom,receiverID,receiverRoom){
     Chat.populate(message, { path: "user", select: selectString}, function(err, popMessage) {
         if(err){
             console.log(err);
-            return res.send(err);
+            return res.json({message:err});
         }
         console.log("the saved message");
         console.log(message);
         req.io.to(senderRoom).emit('messageSaved', popMessage);
         req.io.to(receiverRoom._id).emit('messageReceived',popMessage);
-        req.io.to(receiverID).emit('newMessageReceived', popMessage);
+        req.io.to(receiverID).emit('messageReceived', popMessage);
         res.json({ message: "Chat created" });
     });
 }

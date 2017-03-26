@@ -9,20 +9,62 @@ var revealController = {
     revealed: revealed,
     requested: requested,
     received: received,
-    finish: finish
+    finish: finish,
+    check: check
 };
 
+/*
+    friendship code
+    0 -no friends
+    1 - user1 is the requester
+    2- user2 is the requested
+    3 - friends
+*/
 module.exports = revealController;
-
+function check(req,res){
+    var user1 = req.user;
+    var user2 = req.query.secondUser;
+    User.getFriendship(user1,user2,function(err,friendship){
+        if(err){
+            return res.json({"message":err});
+        }
+        if(!friendship){
+            return res.json(0);
+        }
+        if(friendship){
+            if(friendship.status == 'Pending'){
+                if(friendship.requester._id == user1){
+                    return res.json(1);
+                }
+                else if(friendship.requester._id == user2){
+                    return res.json(2);
+                }
+            }
+            else if(friendship.status == 'Accepted'){
+                return res.json(3);
+            }
+        }
+    })
+    
+}
 
 function initiate(req,res){
     var firstUserID = req.user;
-    var secondUserID = req.query.secondUser;
+    var secondUserID = req.body.secondUser;
+    console.log("intiated");
+    console.log(req.body);
+    console.log(firstUserID);
+    console.log(secondUserID);
     User.friendRequest(firstUserID,secondUserID,function(err,request){
         if(err){
             return res.json(err);
         }
-         res.json({"message":"Request sent. Number of Requests left"});
+        if(request){
+         res.json({request:request,"message":"Request sent. Number of Requests left"});   
+        }
+        else{
+            res.json({"message":"request not created"});
+        }
     });
 /*    var secondUserOptions = {};
     secondUserOptions.select = 'revealReceived';
@@ -55,7 +97,7 @@ function initiate(req,res){
 
 function cancel(req,res){
     var firstUserID = req.user;
-    var secondUserID = req.query.secondUser;
+    var secondUserID = req.body.secondUser;
     User.cancelRequest(firstUserID,secondUserID,function(err,request){
         if(err){
             return res.json(err);
@@ -105,7 +147,7 @@ function accept(req,res){
         second user is going to accept it.
     */
     var firstUserID = req.user;
-    var secondUserID = req.query.secondUser;
+    var secondUserID = req.body.secondUser;
     User.acceptRequest(firstUserID,secondUserID,function(err,request){
         if(err){
             return res.json(err);
@@ -177,7 +219,7 @@ function accept(req,res){
 
 function ignore(req,res){
     var firstUserID = req.user;
-    var secondUserID = req.query.secondUser;
+    var secondUserID = req.body.secondUser;
     User.denyRequest(firstUserID,secondUserID,function(err,request){
         if(err){
             return res.json(err);
@@ -192,7 +234,7 @@ function requested(req,res){
     */
     //var firstUserID = req.query.firstUser;
     var firstUserID = req.user;
-    //var secondUserID = req.query.secondUser;
+    //var secondUserID = req.body.secondUser;
     User.getSentRequests(firstUserID,function(err,request){
         if(err){
             return res.json(err);
@@ -220,7 +262,7 @@ function requested(req,res){
 function received(req,res){
     //var firstUserID = req.query.firstUser;
     var firstUserID = req.user;
-    //var secondUserID = req.query.secondUser;
+    //var secondUserID = req.body.secondUser;
     User.getReceivedRequests(firstUserID,function(err,request){
         if(err){
             return res.json(err);
@@ -246,7 +288,7 @@ function received(req,res){
 
 function revealed(req,res){
     var firstUserID = req.user;
-    //var secondUserID = req.query.secondUser;
+    //var secondUserID = req.body.secondUser;
     User.getFriends(firstUserID,function(err,request){
         if(err){
             return res.json(err);
@@ -279,7 +321,7 @@ $or: [
       
 function finish(req,res){
     var firstUserID = req.user;
-    var secondUserID = req.query.secondUser;
+    var secondUserID = req.body.secondUser;
     User.endFriendship(firstUserID,secondUserID,function(err,request){
         if(err){
             return res.json(err);

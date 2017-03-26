@@ -2,7 +2,7 @@
 
 var User = require('..//models/user').User;
 
-
+var mongoose = require('mongoose');
 
 var userController = {
   createUser: createUser,
@@ -12,7 +12,40 @@ var userController = {
   getUsers: getUsers
 };
 
-
+function sliceUsers(page,limit,list,anon){
+  let sliceStart = (page-1)*limit;
+  let sliceEnd = limit*page;
+  let newList=[];
+  list.slice(sliceStart,sliceEnd).forEach(function(i){
+    i.posts=undefined;
+    let x;
+    if(anon == 'requested'){
+      x = i.requested;
+    }
+    else if(anon == 'received'){
+      x = i.requester;
+    }
+    else{
+       newList.push(i);
+    }
+    if(anon){
+       x.googleName = undefined;
+       x.facebookName = undefined;
+       x.googlePicture = undefined;
+       x.facebookPicture = undefined;
+       x.google = undefined;
+       x.facebook = undefined;
+       x.revealedPicture = undefined;
+       newList.push(x);
+    }  
+      
+    
+    
+    
+  });
+  
+  return {total:list.length,docs:newList};
+}
 function getUsers(req,res){
         var queryObj = {};
         var options = {};
@@ -21,38 +54,32 @@ function getUsers(req,res){
         options.page = req.query.page || null;
         options.select = 'anonName status picture loc';    
         
-        
-        if(req.query.revealed){
-          options.select = 'status revealedPicture firstName lastName displayName loc';
-          User.findById(req.user).select('revealed').then(function(revealedList){
-            queryObj['_id'] = { "$in": revealedList };  
-            
-            if(req.query.userSearch){
-              var userRe = new RegExp(req.query.userSearch.toLowerCase(), "i");
-              queryObj.$or = [{ 'firstName': { $regex: userRe }}, { 'lastName': { $regex: userRe }},{ 'displayName': { $regex: userRe }}];
+        if(!!req.query.revealed){
+          User.getFriends(mongoose.Types.ObjectId(req.user),function(err,list){
+            if(err){
+              console.log(err);
             }
-            
-            User.paginate(queryObj, options).then(function(userList) {
-              res.json(userList);
-            });
+              return res.json(sliceUsers(options.page,options.limit,list));
           });
+         
            
         }
         else if(req.query.received ){
-          User.findById(req.user).select('received').then(function(revealedList){
-            queryObj['_id'] = { "$in": revealedList };  
-            User.paginate(queryObj, options).then(function(userList) {
-              res.json(userList);
-            });
+          User.getReceivedRequests(mongoose.Types.ObjectId(req.user),function(err,list){
+            if(err){
+              console.log(err);
+            }
+            //return res.json(list);
+              return res.json(sliceUsers(options.page,options.limit,list,'received'));
           });
           
         }
         else if(req.query.requested){
-          User.findById(req.user).select('requested').then(function(revealedList){
-            queryObj['_id'] = { "$in": revealedList };  
-            User.paginate(queryObj, options).then(function(userList) {
-              res.json(userList);
-            });
+          User.getSentRequests(mongoose.Types.ObjectId(req.user),function(err,list){
+            if(err){
+              console.log(err);
+            }
+              return res.json(sliceUsers(options.page,options.limit,list,'requested'));
           });
           
         }
@@ -140,21 +167,23 @@ function createUser(req, res) {
 }
 
 function getUser(req, res) {
-  console.log("get user");
-  console.log(req.user);
+  
   if(req.user == req.params.id){
     revealedUser(req.user,res);
   }
   else{
-    User.findById(req.user)
-    .then(function(result) {
-        if(result.revealed.indexOf(req.params.id)!=-1){
+    User.areFriends( mongoose.Types.ObjectId(req.user),  mongoose.Types.ObjectId(req.params.id),function(err,friends){
+      if(err){
+        console.log(err);
+      }
+      if(friends){
           revealedUser(req.params.id,res);
         }
         else{
           anonUser(req.params.id,res);
         }
-    });  
+    });
+      
   }
   
 }
@@ -222,3 +251,15 @@ module.exports = userController;
                 userInterestQueryObj.push(interestObject);
               }
               queryObj.$or = userInterestQueryObj;*/
+ /*User.findById(req.user).select('revealed').then(function(revealedList){
+            queryObj['_id'] = { "$in": revealedList };  
+            
+            if(req.query.userSearch){
+              var userRe = new RegExp(req.query.userSearch.toLowerCase(), "i");
+              queryObj.$or = [{ 'firstName': { $regex: userRe }}, { 'lastName': { $regex: userRe }},{ 'displayName': { $regex: userRe }}];
+            }
+            
+            User.paginate(queryObj, options).then(function(userList) {
+              res.json(userList);
+            });
+          });*/

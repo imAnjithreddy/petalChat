@@ -1,8 +1,8 @@
 'use strict';
 
-var Upvote = require('..//models/post').Upvote;
+var Upvote = require('..//models/upvote').Upvote;
 
-
+var Post = require('..//models/post').Post;
 
 var upvoteController = {
   createUpvote: createUpvote,
@@ -25,6 +25,7 @@ function createUpvote(req, res) {
       console.log("error" + error);
     }
     else {
+      updateUpvoteLength(req.params.postId);
       res.json(result);
     }
   });
@@ -33,15 +34,24 @@ function createUpvote(req, res) {
 }
 
 function getUpvote(req, res) {
-  Upvote.findOne({post: req.params.postId,user:req.user})
-    .then(function(result) {
+  
+  Upvote.findOne({post: req.params.postId,user:req.user},function(err,result) {
+    if(err){
+      console.log(err);
+    }
+      if(result){
+        console.log("upvote check");
+        console.log(result);
+        updateUpvoteLength(req.params.postId);
+        res.json(true);
+      }
+      else{
+        res.json(false);
+      }
+        
       
-        res.json(result);
-      
-    }).catch(function(err){
-        console.log("upvote get error line 42 ");
-        console.log(err);
     });
+    
 }
 
 
@@ -51,15 +61,36 @@ function deleteUpvote(req, res) {
         user: req.user,
         post: req.params.postId
     };
-  Upvote.findOneAndRemove(queryObj, function(err,upvote) {
+  Upvote.findOne(queryObj, function(err,upvote) {
     if (err) {
       console.log(err);
     }
-    else {
-      res.json({"message":"Upvote has been deleted"});
+    if(upvote){
+      upvote.remove(function(err,removed){
+        if(err){
+          console.log("line 71");
+          console.log(err);
+        }
+        if(removed){
+          console.log("line 75");
+          console.log(removed);
+          updateUpvoteLength(req.params.postId);
+          res.json({"message":"Upvote has been deleted"});    
+        }
+      });
+      
     }
+    
   });
 }
 
-
+function updateUpvoteLength(id){
+  Post.findById(id).select('upvotes').then(function(post){
+    console.log("length of upvotes222222");
+    
+    post.upvotesLength = post.upvotes?post.upvotes.length : 0;
+    console.log(post.upvotesLength);
+    post.save();
+  });
+}
 module.exports = upvoteController;

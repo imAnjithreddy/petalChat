@@ -17,17 +17,25 @@ function createOrFindChatRoom(firstUserID,secondUserID,callBack){
             creator2: creator2
         }
         
-        ChatRoom.findOne(queryObj).then(function(chatRoom){
-            callBack(chatRoom);
-        }).catch(function(){
-            var chatRoom = new ChatRoom();
-            chatRoom.creator1 = creator1;
-            chatRoom.creator2 = creator2;
+        ChatRoom.findOne(queryObj,function(err,chatRoom){
+            if(!chatRoom){
+                console.log("err22");
+                var chatRoom = new ChatRoom();
+                chatRoom.creator1 = creator1;
+                chatRoom.creator2 = creator2;
             
             
-            chatRoom.save().then(function(savedChatRoom){
-                callBack(savedChatRoom);
-            });
+                chatRoom.save(function(err,savedChatRoom){
+                    if(err){
+                        console.log(err);
+                    }
+                    callBack(savedChatRoom);
+                });    
+            }
+            else{
+                callBack(chatRoom);    
+            }
+            
         });
 }
 
@@ -40,10 +48,10 @@ function getChatRoom(req,res){
         
     }
     createOrFindChatRoom(req.user,req.params.user,function(chatRoom){
-        if(!chatRoom.chats){
             createOrFindChatRoom(req.params.user,req.user,function(chatRoom){
+                console.log("line45");
             });
-        }
+        
         res.json(chatRoom);        
     });
 }
@@ -68,7 +76,7 @@ function getChatRooms(req, res) {
             userSelectString = 'displayName picture revealedPicture';
         }
         options.populate = [{ path: 'creator1', model: 'User', select: userSelectString },
-                            { path: 'lastMessage', model: 'Chat', select: 'message ' },
+                            { path: 'lastMessage', model: 'Chat', select: 'message type' },
                             { path: 'creator2', model: 'User', select: userSelectString }
         ];
         

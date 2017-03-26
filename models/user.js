@@ -30,7 +30,7 @@ var UserSchema = new Schema({
 	"picture": { type: String, default: 'https://cdn3.iconfinder.com/data/icons/black-easy/512/538303-user_512x512.png' },
 	"displayName": String,
 	"revealedPicture": String,
-	"anonName": String,
+	"anonName": {type:String,default:'anonUser'},
 	"loc": {
     	type: [Number],  // [<longitude>, <latitude>]
     	index: '2d'      // create the geospatial index

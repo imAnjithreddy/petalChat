@@ -9,7 +9,7 @@ var authService = require('../services/authentication');
 
 
 
-upvoteRouter.route('/create').post(authService.ensureAuthenticated,UpvoteController.createUpvote);
+upvoteRouter.route('/create/:postId').post(authService.ensureAuthenticated,UpvoteController.createUpvote);
 upvoteRouter.route('/delete/:postId').post(authService.ensureAuthenticated,UpvoteController.deleteUpvote);
 upvoteRouter.route('/get/:postId').get(authService.ensureAuthenticated,UpvoteController.getUpvote);
 

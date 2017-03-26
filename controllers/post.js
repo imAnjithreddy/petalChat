@@ -24,7 +24,7 @@ function getPosts(req,res){
           queryObj.user = req.query.user;
         }
         if(req.query.nearby){
-    			let maxDistance = req.query.distance*100;
+    			let maxDistance = (req.query.distance||8)*100;
     			maxDistance /= 6371;
     			queryObj.loc={
     				$near: [req.query.longitude,req.query.latitude],
@@ -72,7 +72,7 @@ function createPost(req, res) {
       console.log("error" + error);
     }
     else {
-      res.json(result);
+      res.json({result:result,message:"post has been created"});
     }
   });
 
@@ -81,11 +81,13 @@ function createPost(req, res) {
 
 function getPost(req, res) {
   Post.findById(req.params.id)
+  .populate('user')
     .exec(function(error, result) {
       if (error) {
         console.log("error while reading");
       }
       else {
+        savePostViews(req.params.id);
         res.json(result);
       }
     });
@@ -123,5 +125,10 @@ function deletePost(req, res) {
   });
 }
 
-
+function savePostViews(id){
+  Post.findById(id).select('views').then(function(post){
+    post.views=post.views+1;
+    post.save();
+  })
+}
 module.exports = postController;

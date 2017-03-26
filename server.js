@@ -31,6 +31,7 @@ var chatRoomRouter = require('./routes/chatRoomRoute');
 var authenticateRouter = require('./routes/authRoute');
 var postRouter = require('./routes/postRoute');
 var userRouter = require('./routes/userRoute');
+var uploadRouter = require('./routes/uploadRoute');
 var revealRouter = require('./routes/revealRoute');
 
 app.use(bodyParser.urlencoded({extended:true}));
@@ -46,6 +47,7 @@ app.use('/upvote',upvoteRouter);
 app.use('/reveal',revealRouter);
 app.use('/authenticate',authenticateRouter);
 app.use('/city',cityRouter);
+app.use('/upload',uploadRouter);
 app.use('/post',postRouter);
 app.use(express.static(__dirname + '/public'));
 app.use(function(req, res, next) {
@@ -63,7 +65,6 @@ io.on('connection', function(socket) {
         socket.join(room.roomId);
     });
     socket.on('addToSingleRoom', function(singleRoom) {
-      
         socket.join(singleRoom.roomId);
     });
     socket.on('removeFromRoom', function(room) {
