@@ -57,6 +57,9 @@ app.use(function(req, res, next) {
 app.use('/chat', chatRouter);
 app.use('/chatRoom', chatRoomRouter);
 
+app.get('*', function (req, res) {
+        res.sendFile(__dirname + '/client/index.html'); // load the single view file (angular will handle the page changes on the front-end)
+});
 
 io.on('connection', function(socket) {
     
