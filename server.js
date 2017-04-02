@@ -16,6 +16,8 @@ var cors = require('cors');
 mongoose.Promise = global.Promise;
 
 var config = require('./config');
+console.log("**********the db url11111**********");
+  console.log(app.settings.env);
   app.set('dbUrl', config.db[app.settings.env]);
   // connect mongoose to the mongo dbUrl
   console.log("**********the db url**********");
