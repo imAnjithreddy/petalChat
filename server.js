@@ -18,6 +18,8 @@ mongoose.Promise = global.Promise;
 var config = require('./config');
   app.set('dbUrl', config.db[app.settings.env]);
   // connect mongoose to the mongo dbUrl
+  console.log("**********the db url**********");
+  console.log(app.get('dbUrl'));
   mongoose.connect(app.get('dbUrl'));
 
 var port = process.env.PORT || 3000;
