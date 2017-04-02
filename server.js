@@ -24,6 +24,12 @@ var port = process.env.PORT || 3000;
 
 
 app.use(cors());
+if (app.get('env') === 'production') {
+  app.use(function(req, res, next) {
+    var protocol = req.get('x-forwarded-proto');
+    protocol == 'https' ? next() : res.redirect('https://' + req.hostname + req.url);
+  });
+}
 var cityRouter = require('./routes/city');
 var upvoteRouter = require('./routes/upvoteRoute');
 var chatRouter = require('./routes/chatRoute');
