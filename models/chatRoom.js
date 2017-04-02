@@ -15,6 +15,7 @@ var ChatRoomSchema = new Schema({
 	chats: [{ type: Schema.ObjectId, ref: "Chat" }],
 	lastMessage: { type: Schema.ObjectId, ref: "Chat" },
 	lastMessageTime: { type: Date },
+	lastLoggedOut: { type: Date },
 	revealed: {type:Boolean, default: false}
 
 });

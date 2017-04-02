@@ -1,8 +1,7 @@
 'use strict';
-var userModel = require("..//models/user");
 var chatModel = require('..//models/chat');
 var chatRoomModel = require('..//models/chatRoom');
-var User = userModel.User;
+
 var Chat = chatModel.Chat;
 var ChatRoom = chatRoomModel.ChatRoom;
 
@@ -11,7 +10,7 @@ var chatController = {
     getChats: getChats,
     createChat: createChat,
     
-}
+};
 
 function getChats(req, res) {
         var queryObj = {};
@@ -74,8 +73,16 @@ function createChat(req, res) {
                 
                 chat2.chatRoom = savedChatRoom._id;
                 
-                chat2.save();
-                sendMessage(req,res,savedMessage,chat.chatRoom,chat.receiver,savedChatRoom);    
+                chat2.save(function(err,savedChat2){
+                    if(err){
+                        console.log(err);
+                    }
+                    console.log("the receiver");
+                    console.log(receiver);
+                    sendMessage(req,res,savedMessage,chat.chatRoom,receiver,savedChatRoom);
+                });
+                
+                    
             });
             
         });
@@ -99,8 +106,6 @@ function saveChatRoom(queryObj,message,callback){
         if(!chatRoom){
             chatRoom = new ChatRoom();
         }
-        console.log("saving message");
-        console.log(message);
         chatRoom.lastMessage = message;
         chatRoom.lastMessageTime = message.time;
         chatRoom.save(function(err,chatRoomSaved){
@@ -126,11 +131,9 @@ function sendMessage(req,res,message,senderRoom,receiverID,receiverRoom){
             console.log(err);
             return res.json({message:err});
         }
-        console.log("the saved message");
-        console.log(message);
         req.io.to(senderRoom).emit('messageSaved', popMessage);
         req.io.to(receiverRoom._id).emit('messageReceived',popMessage);
-        req.io.to(receiverID).emit('messageReceived', popMessage);
+        req.io.to(receiverID).emit('newMessageReceived', popMessage);
         res.json({ message: "Chat created" });
     });
 }

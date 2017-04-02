@@ -52,7 +52,7 @@ function getUsers(req,res){
         options.limit = req.query.limit ? parseInt(req.query.limit) : null;
         options.sort = req.query.sort || null;
         options.page = req.query.page || null;
-        options.select = 'anonName status picture loc';    
+        options.select = 'anonName status picture loc interests';    
         
         if(!!req.query.revealed){
           User.getFriends(mongoose.Types.ObjectId(req.user),function(err,list){
@@ -86,8 +86,8 @@ function getUsers(req,res){
         else if(req.query.all){
             if(req.query.interest){
           
-             var userRe = new RegExp(req.query.interest.toLowerCase(), "i");
-              queryObj.interest =userRe;
+             queryObj.interests = new RegExp(req.query.interest.toLowerCase(), "i");
+               
             
             }
             User.paginate(queryObj, options).then(function(userList) {
@@ -110,12 +110,17 @@ function getUsers(req,res){
 
 function generateUserObj(item,existingUser){
   
-    var user = existingUser || new User();  
-  if(item.firstName){
+  var user = existingUser || new User();  
+  //console.log("")
+  //Object.keys(item);
+  if(item.firstName!==undefined){
     user.firstName = item.firstName.toLowerCase();  
   }
-  if(item.lastName){
+  if(item.lastName!==undefined){
     user.lastName = item.lastName.toLowerCase();  
+  }
+  if(item.picture){
+    user.picture = item.picture;  
   }
   if(item.email){
     user.email = item.email;  
@@ -132,19 +137,32 @@ function generateUserObj(item,existingUser){
   if(item.bio){
     user.bio = item.bio;  
   }
-  if(item.status){
+  if(item.status!==undefined){
+    console.log("user status");
+    console.log(item.status);
     user.status = item.status;  
   }
-  if(item.displayName){
+  if(item.displayName!==undefined){
     user.displayName = item.displayName;
   }
-  if(item.anonName){
+  if(item.anonName!==undefined){
     user.anonName = item.anonName;
   }
   if(item.latitude && item.longitude){
     console.log("the latitude and longitude");
     console.log(item.latitude+"::"+item.longitude);
     user.loc = [item.longitude,item.latitude];  
+  }
+  if(item.interests!==undefined){
+    if(item.interests.length>0){
+      user.interests = item.interests.split('!');
+    user.interests.splice(0,1);
+    user.interests = user.interests.map((interest)=>interest.trim());  
+    }
+    else{
+      user.interests = '';
+    }
+    
   }
   return user;
 

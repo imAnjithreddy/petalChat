@@ -68,6 +68,8 @@ io.on('connection', function(socket) {
         socket.join(singleRoom.roomId);
     });
     socket.on('removeFromRoom', function(room) {
+        console.log("left room");
+        console.log(room.roomId);
         socket.leave(room.roomId);
     });
     socket.on('disconnect', function() {

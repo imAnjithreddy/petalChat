@@ -23,8 +23,14 @@ function getPosts(req,res){
         if(req.query.user){
           queryObj.user = req.query.user;
         }
+        if(req.query.interest){
+          
+              queryObj.interests= new RegExp(req.query.interest.toLowerCase(), "i");
+              
+            
+            }
         if(req.query.nearby){
-    			let maxDistance = (req.query.distance||8)*100;
+    			let maxDistance = (req.query.distance||18)*100;
     			maxDistance /= 6371;
     			queryObj.loc={
     				$near: [req.query.longitude,req.query.latitude],
@@ -51,8 +57,8 @@ function generatePostObj(user,item){
   if(item.latitude && item.longitude){
     post.loc = [item.longitude,item.latitude];  
   }
-  if(item.interest){
-    post.interests = item.interest.split('!');
+  if(item.interests && item.interests.length>0){
+    post.interests = item.interests.split('!');
     post.interests.splice(0,1);
     post.interests = post.interests.map((interest)=>interest.trim());
   }

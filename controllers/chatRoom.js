@@ -5,7 +5,8 @@ var ChatRoom = chatModel.ChatRoom;
 var chatRoomController = {
     getChatRoom: getChatRoom,
     getChatRooms: getChatRooms,
-    createOrFindChatRoom: createOrFindChatRoom
+    createOrFindChatRoom: createOrFindChatRoom,
+    updateChatRoom: updateChatRoom
 };
 
 function createOrFindChatRoom(firstUserID,secondUserID,callBack){
@@ -15,11 +16,15 @@ function createOrFindChatRoom(firstUserID,secondUserID,callBack){
         var queryObj = {
             creator1: creator1,
             creator2: creator2
-        }
+        };
         
         ChatRoom.findOne(queryObj,function(err,chatRoom){
+            if(err){
+                console.log("line 23");
+                console.log(err);
+            }
             if(!chatRoom){
-                console.log("err22");
+                
                 var chatRoom = new ChatRoom();
                 chatRoom.creator1 = creator1;
                 chatRoom.creator2 = creator2;
@@ -39,7 +44,17 @@ function createOrFindChatRoom(firstUserID,secondUserID,callBack){
         });
 }
 
-
+function updateChatRoom(req,res){
+    ChatRoom.findById(req.params.id).then(function(chatRoom){
+        chatRoom.lastLoggedOut = new Date();
+        chatRoom.save(function(err,savedChatRoom){
+            if(err){
+                return res.json(err);
+            }
+            return res.json(savedChatRoom);
+        })
+    })
+}
 function getChatRoom(req,res){
     
     if(req.user == req.params.user){
@@ -49,7 +64,7 @@ function getChatRoom(req,res){
     }
     createOrFindChatRoom(req.user,req.params.user,function(chatRoom){
             createOrFindChatRoom(req.params.user,req.user,function(chatRoom){
-                console.log("line45");
+                
             });
         
         res.json(chatRoom);        
@@ -69,11 +84,11 @@ function getChatRooms(req, res) {
         options.page = req.query.page || 1;
         options.select = '-chats';
         var userSelectString = ' anonName picture ';
-        console.log(typeof req.query.revealed);
+        
         if(req.query.revealed=='true'){
             queryObj.revealed = true;
-            console.log("hsdfjsdhfhsdf");
-            userSelectString = 'displayName picture revealedPicture';
+        
+            userSelectString = 'displayName picture googlePicture facebookPicture googleName facebookName revealedPicture';
         }
         options.populate = [{ path: 'creator1', model: 'User', select: userSelectString },
                             { path: 'lastMessage', model: 'Chat', select: 'message type' },
