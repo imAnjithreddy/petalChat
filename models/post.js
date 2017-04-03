@@ -10,6 +10,8 @@ var PostSchema = new Schema({
 	content: String,
 	time: { type: Date, default: Date.now },
 	user: { type: Schema.ObjectId, ref: "User", childPath: "posts"},
+	image: {type:String},
+	imageId: {type:String},
 	interests: [String],
 	loc: {
     		type: [Number],  // [<longitude>, <latitude>]

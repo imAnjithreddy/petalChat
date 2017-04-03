@@ -16,8 +16,31 @@ cloudinary.config({
 var uploadController = {
   singleUpload: singleUpload,
   multipleUpload: multipleUpload,
+  deleteUpload: deleteUpload,
+  singleUploadId: singleUploadId
 };
-// 
+
+function deleteUpload(req,res){
+  var public_id = req.body.data.public_id;
+  
+  cloudinary.uploader.destroy(public_id,function(err,result){
+    
+    console.log("deleted");
+    console.log(public_id);
+    console.log(result);
+    res.json(result);
+  });
+}
+function singleUploadId(req, res){
+  var file = req.file;    
+  
+  cloudinary.uploader.upload(file.path,function(reqc, resc) {
+    var imgUrl = resc.url;
+    var  public_id = resc. public_id;
+    console.log("inside upload");
+    res.json({image:imgUrl,imageId:public_id});
+  });
+} 
 function singleUpload(req, res){
   var file = req.file;    
   console.log("image upload");

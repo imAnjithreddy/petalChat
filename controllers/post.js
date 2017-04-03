@@ -57,11 +57,17 @@ function generatePostObj(user,item){
   if(item.latitude && item.longitude){
     post.loc = [item.longitude,item.latitude];  
   }
+  if(item.image){
+    post.image = item.image;  
+  }
+  if( item.imageId){
+    post.imageId = item.imageId;  
+  }
   if(item.interests && item.interests.length>0){
     post.interests = item.interests.split('!');
     post.interests.splice(0,1);
     post.interests = post.interests.map((interest)=>interest.trim());
-}
+  }
   
   return post;
 
