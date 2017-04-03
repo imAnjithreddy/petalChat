@@ -20,7 +20,7 @@ var uploadController = {
 function singleUpload(req, res){
   var file = req.file;    
   console.log("image upload");
-  cloudinary.uploader.upload(file.path, function(reqc, resc) {
+  cloudinary.uploader.upload(cloudinary.image(file.path, {effect: "grayscale"}), function(reqc, resc) {
     var imgUrl = resc.url;
     res.send(imgUrl);
   });

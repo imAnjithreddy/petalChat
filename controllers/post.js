@@ -61,7 +61,7 @@ function generatePostObj(user,item){
     post.interests = item.interests.split('!');
     post.interests.splice(0,1);
     post.interests = post.interests.map((interest)=>interest.trim());
-  }
+}
   
   return post;
 
