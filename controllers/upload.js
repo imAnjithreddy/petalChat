@@ -17,10 +17,13 @@ var uploadController = {
   singleUpload: singleUpload,
   multipleUpload: multipleUpload,
 };
+// 
 function singleUpload(req, res){
   var file = req.file;    
   console.log("image upload");
-  cloudinary.uploader.upload(file.path, function(reqc, resc) {
+  cloudinary.uploader.upload(file.path,{ eager: [
+    {effect: "grayscale"}
+         ]},function(reqc, resc) {
     var imgUrl = resc.url;
     
     res.send(imgUrl);
