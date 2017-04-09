@@ -1,7 +1,7 @@
 'use strict';
 var chatModel = require('..//models/chat');
 var chatRoomModel = require('..//models/chatRoom');
-
+var notificationController = require('..//controllers/notification');
 var Chat = chatModel.Chat;
 var ChatRoom = chatRoomModel.ChatRoom;
 
@@ -124,7 +124,7 @@ function saveChatRoom(queryObj,message,callback){
 function sendMessage(req,res,message,senderRoom,receiverID,receiverRoom){
     var selectString = 'anonName picture';
     if(receiverRoom.revealed){
-        selectString = 'displayName  revealedPicture';
+        selectString = 'displayName facebookName googleName facebookPicture googlePicture  revealedPicture';
     }
     Chat.populate(message, { path: "user", select: selectString}, function(err, popMessage) {
         if(err){
@@ -134,6 +134,7 @@ function sendMessage(req,res,message,senderRoom,receiverID,receiverRoom){
         req.io.to(senderRoom).emit('messageSaved', popMessage);
         req.io.to(receiverRoom._id).emit('messageReceived',popMessage);
         req.io.to(receiverID).emit('newMessageReceived', popMessage);
+        notificationController.sendMessageNotification(receiverID,popMessage);
         res.json({ message: "Chat created" });
     });
 }

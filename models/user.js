@@ -15,6 +15,7 @@ var relationship = require("mongoose-relationship"); //Refer https://www.npmjs.c
 var FriendsOfFriends = require('friends-of-friends')(mongoose,defaults);
 var Schema = mongoose.Schema;
 var UserSchema = new Schema({
+	'device_token': String,
 	"firstName": String,
 	"lastName": String,
 	"status": String,

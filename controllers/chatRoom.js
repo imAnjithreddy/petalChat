@@ -91,7 +91,7 @@ function getChatRooms(req, res) {
             userSelectString = 'displayName picture googlePicture facebookPicture googleName facebookName revealedPicture';
         }
         options.populate = [{ path: 'creator1', model: 'User', select: userSelectString },
-                            { path: 'lastMessage', model: 'Chat', select: 'message type' },
+                            { path: 'lastMessage', model: 'Chat', select: 'message type user' },
                             { path: 'creator2', model: 'User', select: userSelectString }
         ];
         

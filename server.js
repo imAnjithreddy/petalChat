@@ -41,6 +41,7 @@ var postRouter = require('./routes/postRoute');
 var userRouter = require('./routes/userRoute');
 var uploadRouter = require('./routes/uploadRoute');
 var revealRouter = require('./routes/revealRoute');
+var notificationRouter = require('./routes/notificationRoute');
 
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
@@ -57,6 +58,7 @@ app.use('/authenticate',authenticateRouter);
 app.use('/city',cityRouter);
 app.use('/upload',uploadRouter);
 app.use('/post',postRouter);
+app.use('/notification',notificationRouter);
 app.use(express.static(__dirname + '/public'));
 app.use(function(req, res, next) {
     req.io = io;
