@@ -76,7 +76,7 @@ function getChatRooms(req, res) {
         var queryObj = {};
         var options = {};
         queryObj.creator1 = creator;
-        
+        queryObj.revealed = false;
         options.limit = req.query.limit ? parseInt(req.query.limit) : 20;
         options.sort = req.query.sort ||{
         lastMessageTime: -1 //Sort by Date Added DESC
@@ -87,7 +87,6 @@ function getChatRooms(req, res) {
         
         if(req.query.revealed=='true'){
             queryObj.revealed = true;
-        
             userSelectString = 'displayName picture googlePicture facebookPicture googleName facebookName revealedPicture';
         }
         options.populate = [{ path: 'creator1', model: 'User', select: userSelectString },

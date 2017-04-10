@@ -102,7 +102,7 @@ function getUsers(req,res){
     				$maxDistance: maxDistance
     			};
     			User.paginate(queryObj, options).then(function(userList) {
-              res.json(userList);
+              return res.json(userList);
           });
 		    }
         //options.populate = req.query.populate || null;
@@ -137,6 +137,10 @@ function generateUserObj(item,existingUser){
   if(item.bio){
     user.bio = item.bio;  
   }
+  if(item.gender!==undefined){
+    user.gender = item.gender;  
+  }
+  
   if(item.status!==undefined){
     console.log("user status");
     console.log(item.status);
