@@ -69,7 +69,8 @@ function getUsers(req,res){
             if(err){
               console.log(err);
             }
-            //return res.json(list);
+            
+           
               return res.json(sliceUsers(options.page,options.limit,list,'received'));
           });
           
@@ -85,10 +86,7 @@ function getUsers(req,res){
         }
         else if(req.query.all){
             if(req.query.interest){
-          
              queryObj.interests = new RegExp(req.query.interest.toLowerCase(), "i");
-               
-            
             }
             User.paginate(queryObj, options).then(function(userList) {
               return res.json(userList);
@@ -113,43 +111,23 @@ function generateUserObj(item,existingUser){
   var user = existingUser || new User();  
   //console.log("")
   //Object.keys(item);
-  if(item.firstName!==undefined){
-    user.firstName = item.firstName.toLowerCase();  
-  }
-  if(item.lastName!==undefined){
-    user.lastName = item.lastName.toLowerCase();  
-  }
+  
+  
   if(item.picture){
     user.picture = item.picture;  
   }
-  if(item.email){
-    user.email = item.email;  
-  }
-  if(item.bannerImage){
-    user.bannerImage = item.bannerImage;  
-  }
-  if(item.userImages){
-    user.userImages = item.userImages;  
-  }
-  if(item.phone){
-    user.phone = item.phone;  
-  }
-  if(item.bio){
-    user.bio = item.bio;  
-  }
-  if(item.gender!==undefined){
+  
+  if(item.gender){
     user.gender = item.gender;  
   }
   
-  if(item.status!==undefined){
-    console.log("user status");
+  if(item.hasOwnProperty('status')){
+    console.log("user status222222");
     console.log(item.status);
     user.status = item.status;  
   }
-  if(item.displayName!==undefined){
-    user.displayName = item.displayName;
-  }
-  if(item.anonName!==undefined){
+  
+  if(item.anonName){
     user.anonName = item.anonName;
   }
   if(item.latitude && item.longitude){
@@ -157,14 +135,14 @@ function generateUserObj(item,existingUser){
     console.log(item.latitude+"::"+item.longitude);
     user.loc = [item.longitude,item.latitude];  
   }
-  if(item.interests!==undefined){
+  if(item.hasOwnProperty('interests')){
     if(item.interests.length>0){
       user.interests = item.interests.split('!');
     user.interests.splice(0,1);
     user.interests = user.interests.map((interest)=>interest.trim());  
     }
     else{
-      user.interests = '';
+      user.interests = [];
     }
     
   }
@@ -230,6 +208,7 @@ function updateUser(req, res) {
     	console.log(err);
       
     }
+    if(foundUser){
       console.log("the requested object");
       console.log(req.body.user);
       var user = generateUserObj(req.body.user,foundUser);
@@ -238,8 +217,10 @@ function updateUser(req, res) {
         if (err) {
           console.log(err);
         }
-        res.json(result);
+        return res.json(result);
       });
+    }
+      
     
   });
 }

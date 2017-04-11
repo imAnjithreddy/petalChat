@@ -11,10 +11,16 @@ var notificationController = {
   sendMessageNotification: sendMessageNotification
 };
 function sendMessageNotification(userId,popMessage){
-    
+    let messageContent;
+    if(popMessage.type=='img'){
+        messageContent = 'New Image';
+    }
+    else{
+        messageContent = popMessage.message;
+    }
     sendNotification(userId,{
         title: popMessage.user.anonName||popMessage.user.googleName||popMessage.user.facebookName,
-        message: popMessage.message,
+        message: messageContent,
         icon: popMessage.user.facebookPicture||popMessage.user.googlePicture||popMessage.user.picture,
         collapseKey: 'messagefrom'+popMessage.user._id
     });
@@ -52,10 +58,16 @@ function sendNotification(userId,notificationMessage){
 }
 function register(req,res){
     User.findById(req.user).then(function(user){
-        user.device_token = req.body.device_token;
-        user.save().then(function(savedUser){
-            res.json({'message':'devicetokensaved'});
-        });
+        if(user){
+            user.device_token = req.body.device_token;
+            user.save().then(function(savedUser){
+                return res.json({'message':'devicetokensaved'});
+            });    
+        }
+        else{
+            return res.json({'message':'not registered'});
+        }
+        
     });    
 }
 module.exports = notificationController;

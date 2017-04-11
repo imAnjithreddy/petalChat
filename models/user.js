@@ -20,7 +20,6 @@ var UserSchema = new Schema({
 	"lastName": String,
 	"status": String,
 	"gender": { type: String, enum: ['Male', 'Female','Other'] },
-	"bio": String,
 	"interests": [String],
 	"postInterests": [String],
 	"password": String,
