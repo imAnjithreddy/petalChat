@@ -29,19 +29,19 @@ function check(req,res){
             return res.json({"message":err});
         }
         if(!friendship){
-            return res.json(0);
+            return res.json({status:0,date:new Date()});
         }
         if(friendship){
             if(friendship.status == 'Pending'){
                 if(friendship.requester._id == user1){
-                    return res.json(1);
+                     res.json({status:1,date:new Date()});
                 }
                 else if(friendship.requester._id == user2){
-                    return res.json(2);
+                     res.json({status:2,date:new Date()});
                 }
             }
             else if(friendship.status == 'Accepted'){
-                return res.json(3);
+                 res.json({status:3,date:new Date()});
             }
         }
     })

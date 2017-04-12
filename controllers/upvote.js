@@ -18,8 +18,7 @@ function createUpvote(req, res) {
   var upvote = new Upvote();
   upvote.post = req.params.postId;
   upvote.user = req.user;
-  console.log("from the upvote");
-  console.log(upvote);
+ 
   upvote.save(function(error, result) {
     if (error) {
       console.log("error" + error);
@@ -39,10 +38,11 @@ function getUpvote(req, res) {
     if(err){
       console.log(err);
     }
+    
+    updateUpvoteLength(req.params.postId);
       if(result){
-        console.log("upvote check");
-        console.log(result);
-        updateUpvoteLength(req.params.postId);
+        
+        
         res.json(true);
       }
       else{
@@ -72,8 +72,7 @@ function deleteUpvote(req, res) {
           console.log(err);
         }
         if(removed){
-          console.log("line 75");
-          console.log(removed);
+         
           updateUpvoteLength(req.params.postId);
           res.json({"message":"Upvote has been deleted"});    
         }
@@ -85,11 +84,11 @@ function deleteUpvote(req, res) {
 }
 
 function updateUpvoteLength(id){
-  Post.findById(id).select('upvotes').then(function(post){
-    console.log("length of upvotes222222");
+  Post.findById(id).select('upvotes views').then(function(post){
     
     post.upvotesLength = post.upvotes?post.upvotes.length : 0;
-    console.log(post.upvotesLength);
+    post.views = post.views+1;
+    
     post.save();
   });
 }

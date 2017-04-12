@@ -32,15 +32,18 @@ function getPosts(req,res){
         if(req.query.nearby){
     			let maxDistance = (req.query.distance||18)*100;
     			maxDistance /= 6371;
+    			queryObj.loc = { $ne: null };
     			queryObj.loc={
     				$near: [req.query.longitude,req.query.latitude],
     				$maxDistance: maxDistance
     			};
+    			
 		    }
         
         options.populate = { path: 'user', model: 'User', select: 'anonName picture status' };
         
         Post.paginate(queryObj, options).then(function(postList) {
+            postList.time = new Date();
             res.json(postList);
         });
         

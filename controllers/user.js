@@ -93,6 +93,7 @@ function getUsers(req,res){
             });
         }
         else if(req.query.nearby){
+          queryObj.loc = { $ne: null };
     			let maxDistance = req.query.distance*100;
     			maxDistance /= 6371;
     			queryObj.loc={
@@ -100,7 +101,8 @@ function getUsers(req,res){
     				$maxDistance: maxDistance
     			};
     			User.paginate(queryObj, options).then(function(userList) {
-              return res.json(userList);
+    			    userList.time = new Date();
+              res.json(userList);
           });
 		    }
         //options.populate = req.query.populate || null;
