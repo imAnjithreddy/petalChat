@@ -52,7 +52,7 @@ function getUsers(req,res){
         options.limit = req.query.limit ? parseInt(req.query.limit) : null;
         options.sort = req.query.sort || null;
         options.page = req.query.page || null;
-        options.select = 'anonName status picture loc interests';    
+        options.select = 'anonName status picture loc interests gender';    
         
         if(!!req.query.revealed){
           User.getFriends(mongoose.Types.ObjectId(req.user),function(err,list){

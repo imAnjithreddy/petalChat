@@ -19,7 +19,7 @@ function getChats(req, res) {
         queryObj.chatRoom = req.params.roomID;
         
         var options ={};
-        options.limit = 20;//req.query.limit ? parseInt(req.query.limit) : 50;
+        options.limit = 15;//req.query.limit ? parseInt(req.query.limit) : 50;
         options.sort = {
             time: -1
         };
