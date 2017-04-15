@@ -1,5 +1,5 @@
 'use strict';
-var qs = require('querystring');
+
 var request = require('request');
 var jwt = require('jwt-simple');
 var models = require('..//models/user');
@@ -297,7 +297,7 @@ module.exports =  function(req, res) {
             user.gender = 'Other';
             user.anonName = userArray[Math.floor(Math.random() * (userArray.length-1))];
             user.status = "Hi, I am new to Petal Chat";
-            user.picture = 'http://lorempixel.com/200/200/people/';
+            user.picture = 'https://api.adorable.io/avatars/285/'+user.anonName+'.png';
             user.facebookPicture =  'https://graph.facebook.com/v2.3/' + profile.id + '/picture?type=large';
             user.picture = 'http://lorempixel.com/200/200/people/';
             user.facebookName =  profile.name;
@@ -319,7 +319,7 @@ module.exports =  function(req, res) {
           user.anonName = userArray[Math.floor(Math.random() * (userArray.length - 1))];
           user.gender = 'Other';
           user.status = "Hi, I am new to Petal Chat";
-          user.picture = 'http://lorempixel.com/200/200/people/';
+          user.picture = 'https://api.adorable.io/avatars/285/'+user.anonName+'.png';
           user.facebookPicture =  'https://graph.facebook.com/v2.3/' + profile.id + '/picture?type=large';
             user.facebookName =  profile.name;
           user.save(function() {
