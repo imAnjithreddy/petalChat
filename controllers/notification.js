@@ -36,7 +36,7 @@ function sendNotification(userId,notificationMessage){
     message.addData('title',notificationMessage.title );
     message.addData('message', notificationMessage.message);
     message.addData('icon', notificationMessage.icon);
-    //message.addData('sound', 'notification');
+    message.addData('sound', 'notification');
 
     message.collapseKey = notificationMessage.collapseKey; //grouping messages
     message.delayWhileIdle = true; //delay sending while receiving device is offline

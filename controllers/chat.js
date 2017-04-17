@@ -77,8 +77,7 @@ function createChat(req, res) {
                     if(err){
                         console.log(err);
                     }
-                    console.log("the receiver");
-                    console.log(receiver);
+                    
                     sendMessage(req,res,savedMessage,chat.chatRoom,receiver,savedChatRoom);
                 });
                 
@@ -131,11 +130,28 @@ function sendMessage(req,res,message,senderRoom,receiverID,receiverRoom){
             console.log(err);
             return res.json({message:err});
         }
+        
+        
+        
         req.io.to(senderRoom).emit('messageSaved', popMessage);
         req.io.to(receiverRoom._id).emit('messageReceived',popMessage);
         req.io.to(receiverID).emit('newMessageReceived', popMessage);
-        notificationController.sendMessageNotification(receiverID,popMessage);
-        res.json({ message: "Chat created" });
+        var userOnline;
+        try{
+            for (var i in req.io.sockets.adapter.rooms) {
+                if(i==receiverID){
+                    userOnline = true;
+                }
+            }    
+        }
+        catch(err){
+            console.log(err);
+        }
+        if(!userOnline){
+            notificationController.sendMessageNotification(receiverID,popMessage);    
+        }
+        
+        res.json({ message: message });
     });
 }
 module.exports = chatController;

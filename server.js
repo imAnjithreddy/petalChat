@@ -22,7 +22,7 @@ var config = require('./config');
 
   mongoose.connect(app.get('dbUrl'));
 
-var port = process.env.PORT || 3000;
+
 
 
 app.use(cors());
