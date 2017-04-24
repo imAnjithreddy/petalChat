@@ -265,12 +265,13 @@ module.exports =  function(req, res) {
     client_secret: clientSecret,
     redirect_uri: req.body.redirectUri 
   };
-
+  console.log("entered");
   // Step 1. Exchange authorization code for access token.
   request.get({ url: accessTokenUrl, qs: params, json: true }, function(err, response, accessToken) {
     
     if (response.statusCode !== 200) {
       
+      console.log(err);
       return res.status(500).send({ message: accessToken.error.message });
     }
 
@@ -278,7 +279,9 @@ module.exports =  function(req, res) {
     request.get({ url: graphApiUrl, qs: accessToken, json: true }, function(err, response, profile) {
       
       if (response.statusCode !== 200) {
-      
+        console.log("*********************entered222*******************");
+        console.log(err);
+        console.log(profile);
         return res.status(500).send({ message: profile.error.message });
       }
       if (req.header('Authorization')) {
