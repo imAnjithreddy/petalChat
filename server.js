@@ -78,6 +78,7 @@ io.on('connection', function(socket) {
         socket.join(room.roomId);
     });
     socket.on('addToSingleRoom', function(singleRoom) {
+        console.log("joined the room singleroom");
         socket.join(singleRoom.roomId);
     });
     socket.on('removeFromRoom', function(room) {
@@ -86,7 +87,7 @@ io.on('connection', function(socket) {
         socket.leave(room.roomId);
     });
     socket.on('disconnect', function() {
-        
+        console.log("disconnected");
     });
 });
 server.listen(app.get('port'), function() {

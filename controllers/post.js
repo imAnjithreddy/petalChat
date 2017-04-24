@@ -12,7 +12,42 @@ var postController = {
   getPosts: getPosts
 };
 
-
+function getLocation(req,error,callback){
+        let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        if (ip.substr(0, 7) == "::ffff:") {
+          ip = ip.substr(7);
+        }
+          var freegeoip = require('node-freegeoip');
+          freegeoip.getLocation(ip, function(err, location) {
+            if(err){
+              error();
+            }
+            callback(location);
+          });
+}
+function getNearByPosts(req,res,options,queryObj){
+  let maxDistance = (req.query.distance||18)*100;
+    			maxDistance /= 6371;
+    			queryObj.loc = { $ne: null };
+    			queryObj.loc={
+    				$near: [req.query.longitude,req.query.latitude],
+    				$maxDistance: maxDistance
+    			};
+    			 options.populate = { path: 'user', model: 'User', select: 'anonName picture status' };
+        
+        Post.paginate(queryObj, options).then(function(postList) {
+            postList.time = new Date();
+            return res.json(postList);
+        });
+}
+function getFilteredPosts(req,res,options,queryObj){
+  options.populate = { path: 'user', model: 'User', select: 'anonName picture status' };
+        
+        Post.paginate(queryObj, options).then(function(postList) {
+            postList.time = new Date();
+            return res.json(postList);
+        });
+}
 function getPosts(req,res){
         var queryObj = {};
         var options = {};
@@ -22,30 +57,43 @@ function getPosts(req,res){
         
         if(req.query.user){
           queryObj.user = req.query.user;
+          return getFilteredPosts(req,res,options,queryObj);
         }
-        if(req.query.interest){
-          
+        else if(req.query.interest){
               queryObj.interests= new RegExp(req.query.interest.toLowerCase(), "i");
-              
-            
-            }
-        if(req.query.nearby){
-    			let maxDistance = (req.query.distance||18)*100;
-    			maxDistance /= 6371;
-    			queryObj.loc = { $ne: null };
-    			queryObj.loc={
-    				$near: [req.query.longitude,req.query.latitude],
-    				$maxDistance: maxDistance
-    			};
+              return getFilteredPosts(req,res,options,queryObj);
+        }
+        else if(req.query.nearby){
     			
+    			if(!req.query.latitude ){
+    			  getLocation(req,function(err){
+    			    console.log(err);
+    			  },function(location){
+    			    req.query.longitude = location.longitude;
+    			    req.query.latitude = location.latitude;
+    			    
+    			    getNearByPosts(req,res,options,queryObj);
+    			    
+    			  });
+    			}
+    			else{
+    			  let maxDistance = (req.query.distance||18)*100;
+      			maxDistance /= 6371;
+      			queryObj.loc = { $ne: null };
+      			queryObj.loc={
+    				  $near: [req.query.longitude,req.query.latitude],
+    				  $maxDistance: maxDistance
+    			  };
+    			  getNearByPosts(req,res,options,queryObj);
+    			}
+    			
+    		  
+		    }
+		    else{
+		      return getFilteredPosts(req,res,options,queryObj);
 		    }
         
-        options.populate = { path: 'user', model: 'User', select: 'anonName picture status' };
         
-        Post.paginate(queryObj, options).then(function(postList) {
-            postList.time = new Date();
-            res.json(postList);
-        });
         
 }
 function generatePostObj(user,item){

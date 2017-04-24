@@ -11,7 +11,19 @@ var userController = {
   deleteUser: deleteUser,
   getUsers: getUsers
 };
-
+function getLocation(req,error,callback){
+        let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        if (ip.substr(0, 7) == "::ffff:") {
+          ip = ip.substr(7);
+        }
+          var freegeoip = require('node-freegeoip');
+          freegeoip.getLocation(ip, function(err, location) {
+            if(err){
+              error();
+            }
+            callback(location);
+          });
+}
 function sliceUsers(page,limit,list,anon){
   let sliceStart = (page-1)*limit;
   let sliceEnd = limit*page;
@@ -45,6 +57,19 @@ function sliceUsers(page,limit,list,anon){
   });
   
   return {total:list.length,docs:newList};
+}
+function getNearByUsers(req,res,options,queryObj){
+  queryObj.loc = { $ne: null };
+      			let maxDistance = req.query.distance*100;
+      			maxDistance /= 6371;
+      			queryObj.loc={
+      				$near: [req.query.longitude,req.query.latitude],
+      				$maxDistance: maxDistance
+      			};
+      			User.paginate(queryObj, options).then(function(userList) {
+      			    userList.time = new Date();
+                res.json(userList);
+            });  
 }
 function getUsers(req,res){
         var queryObj = {};
@@ -93,17 +118,29 @@ function getUsers(req,res){
             });
         }
         else if(req.query.nearby){
-          queryObj.loc = { $ne: null };
-    			let maxDistance = req.query.distance*100;
-    			maxDistance /= 6371;
-    			queryObj.loc={
-    				$near: [req.query.longitude,req.query.latitude],
-    				$maxDistance: maxDistance
-    			};
-    			User.paginate(queryObj, options).then(function(userList) {
-    			    userList.time = new Date();
-              res.json(userList);
-          });
+          if(req.query.latitude){
+            queryObj.loc = { $ne: null };
+      			let maxDistance = req.query.distance*100;
+      			maxDistance /= 6371;
+      			queryObj.loc={
+      				$near: [req.query.longitude,req.query.latitude],
+      				$maxDistance: maxDistance
+      			};
+      			User.paginate(queryObj, options).then(function(userList) {
+      			    userList.time = new Date();
+                res.json(userList);
+            });  
+          }
+          else{
+            getLocation(req,function(err){
+    			    console.log(err);
+    			  },function(location){
+    			    req.query.longitude = location.longitude;
+    			    req.query.latitude = location.latitude;
+    			    getNearByUsers(req,res,options,queryObj);
+    			  });
+          }
+          
 		    }
         //options.populate = req.query.populate || null;
 }

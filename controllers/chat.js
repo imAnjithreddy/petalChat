@@ -77,8 +77,8 @@ function createChat(req, res) {
                     if(err){
                         console.log(err);
                     }
-                    
-                    sendMessage(req,res,savedMessage,chat.chatRoom,receiver,savedChatRoom);
+                    console.log(savedChat2);
+                    sendMessage(req,res,savedChat2,chat.chatRoom,receiver,savedChatRoom);
                 });
                 
                     
@@ -138,11 +138,11 @@ function sendMessage(req,res,message,senderRoom,receiverID,receiverRoom){
         req.io.to(receiverID).emit('newMessageReceived', popMessage);
         var userOnline;
         try{
-            for (var i in req.io.sockets.adapter.rooms) {
+            /*for (var i in req.io.sockets.adapter.rooms) {
                 if(i==receiverID){
                     userOnline = true;
                 }
-            }    
+            } */   
         }
         catch(err){
             console.log(err);

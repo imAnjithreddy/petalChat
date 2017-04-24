@@ -32,11 +32,17 @@ function sendNotification(userId,notificationMessage){
 
     var sender = new gcm.Sender(config.secret.pushAndroid); //create a new sender
     var message = new gcm.Message(); //create a new message
-
+    message.addNotification({
+        title: notificationMessage.title,
+        body: notificationMessage.message,
+        icon: 'ic_launcher',
+        sound: 'notification',
+        vibrate:"true"
+    });   /*
     message.addData('title',notificationMessage.title );
     message.addData('message', notificationMessage.message);
     message.addData('icon', notificationMessage.icon);
-    message.addData('sound', 'notification');
+    message.addData('sound', 'notification');*/
 
     message.collapseKey = notificationMessage.collapseKey; //grouping messages
     message.delayWhileIdle = true; //delay sending while receiving device is offline
