@@ -113,6 +113,22 @@ function getUsers(req,res){
             if(req.query.interest){
              queryObj.interests = new RegExp(req.query.interest.toLowerCase(), "i");
             }
+            let randomSort = Math.floor(Math.random() * 5) + 1;
+            if(randomSort==1){
+              options.sort='-facebookName';
+            }
+            else if(randomSort==2){
+              options.sort='facebookName';
+            }
+            else if(randomSort==3){
+              options.sort='anonName';
+            }
+            else if(randomSort==4){
+              options.sort='facebook';
+            }
+            else if(randomSort==5){
+              options.sort='-facebook';
+            }
             User.paginate(queryObj, options).then(function(userList) {
               return res.json(userList);
             });
