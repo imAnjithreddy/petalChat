@@ -77,6 +77,7 @@ function getChatRooms(req, res) {
         var options = {};
         queryObj.creator1 = creator;
         queryObj.revealed = false;
+        queryObj["chats.0"]= { "$exists": true };
         options.limit = req.query.limit ? parseInt(req.query.limit) : 20;
         options.sort = req.query.sort ||{
         lastMessageTime: -1 //Sort by Date Added DESC
