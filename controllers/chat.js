@@ -77,7 +77,7 @@ function createChat(req, res) {
                     if(err){
                         console.log(err);
                     }
-                    console.log(savedChat2);
+                    
                     sendMessage(req,res,savedChat2,chat.chatRoom,receiver,savedChatRoom);
                 });
                 

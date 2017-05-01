@@ -2,10 +2,8 @@
 var http = require('http');
 var io = require('socket.io');
 var express = require('express');
-
 var app = express();
 var server = http.createServer(app);
-
 io = io.listen(server);
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
@@ -23,8 +21,6 @@ var config = require('./config');
   mongoose.connect(app.get('dbUrl'));
 
 
-
-
 app.use(cors());
 if (app.get('env') === 'production') {
   app.use(function(req, res, next) {
@@ -39,6 +35,7 @@ var chatRoomRouter = require('./routes/chatRoomRoute');
 var authenticateRouter = require('./routes/authRoute');
 var postRouter = require('./routes/postRoute');
 var userRouter = require('./routes/userRoute');
+var blockRouter = require('./routes/blockRoute');
 var uploadRouter = require('./routes/uploadRoute');
 var revealRouter = require('./routes/revealRoute');
 var notificationRouter = require('./routes/notificationRoute');
@@ -52,6 +49,7 @@ app.set('port', process.env.PORT || 3000);
 
 
 app.use('/user',userRouter);
+app.use('/block',blockRouter);
 app.use('/upvote',upvoteRouter);
 app.use('/reveal',revealRouter);
 app.use('/authenticate',authenticateRouter);

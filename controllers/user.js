@@ -74,7 +74,7 @@ function getNearByUsers(req,res,options,queryObj){
 function getUsers(req,res){
         var queryObj = {};
         var options = {};
-        options.limit = 80;//req.query.limit ? parseInt(req.query.limit) : null;
+        options.limit = req.query.limit ? parseInt(req.query.limit) : null;
         options.sort = req.query.sort || null;
         options.page = req.query.page || null;
         options.select = 'anonName status picture loc interests gender';    

@@ -51,21 +51,9 @@ UserSchema.methods.toJSON = function() {
 
 };
 
-UserSchema.methods.comparePasswords = function(password, callback) {
-	bcrypt.compare(password, this.password, callback);
-
-};
 UserSchema.plugin(mongoosePaginate);
 
-UserSchema.pre('save', function(next) {
-	var user = this;
-	if (!user.isModified('password')) return next();
-	bcrypt.hash(user.password, null, null, function(err, hash) {
-		if (err) return next(err);
-		user.password = hash;
-		next();
-	});
-});
+
 UserSchema.plugin(FriendsOfFriends.plugin,defaults);
 try{
 	exports.User = mongoose.model('User', UserSchema);

@@ -1,14 +1,42 @@
-var chatModel = require('..//models/chatRoom');
-var userModel = require("..//models/user");
-var User = userModel.User;
-var ChatRoom = chatModel.ChatRoom;
+'use strict';
+
+var chatRoomModel = require('..//models/chatRoom');
+var singlechatModel = require('..//models/chat');
+var Chat = singlechatModel.Chat;
+var ChatRoom = chatRoomModel.ChatRoom;
 var chatRoomController = {
     getChatRoom: getChatRoom,
     getChatRooms: getChatRooms,
     createOrFindChatRoom: createOrFindChatRoom,
-    updateChatRoom: updateChatRoom
+    updateChatRoom: updateChatRoom,
+    deleteChatRoom: deleteChatRoom
 };
 
+
+function deleteChatRoom(req,res){
+    console.log("entered delete chatroom");
+    console.log(req.params);
+    ChatRoom.findOne({_id:req.params.id}).then(function(chatRoom){
+        if(chatRoom){
+            chatRoom.remove(function(err,errdeletedRoom){
+                if(err){
+                    console.log("error while dlete chatroom");
+                    console.log(err);
+                }
+                else{
+                    Chat.find({chatRoom:req.params.id}).then(function(chatRooms){
+                        let arrLength = chatRooms.length;
+                        for (let i = 0; i < arrLength; i++) {
+                            chatRooms[i].remove();
+                        }
+                    });
+                    res.json("deleted chatRoom");    
+                }
+                
+            });
+        }
+    });
+}
 function createOrFindChatRoom(firstUserID,secondUserID,callBack){
         var creator1,creator2;
         creator1 = firstUserID;
