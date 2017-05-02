@@ -113,7 +113,7 @@ function getUsers(req,res){
             if(req.query.interest){
              queryObj.interests = new RegExp(req.query.interest.toLowerCase(), "i");
             }
-            let randomSort = Math.floor(Math.random() * 5) + 1;
+            let randomSort = 4;//Math.floor(Math.random() * 5) + 1;
             if(randomSort==1){
               options.sort='-facebookName';
             }
