@@ -296,7 +296,7 @@ module.exports =  function(req, res) {
               return res.status(400).send({ message: 'User not found' });
             }
             user.facebook = profile.id;
-            user.verified = true;
+            
             user.gender = 'Other';
             user.anonName = userArray[Math.floor(Math.random() * (userArray.length-1))];
             user.status = "Hi, I am new to Petal Chat";

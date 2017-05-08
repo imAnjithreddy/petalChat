@@ -28,6 +28,7 @@ uploadRouter.route('/multipleUpload').post(authService.ensureAuthenticated,uploa
 uploadRouter.route('/singleUpload').post(authService.ensureAuthenticated,upload.single('file'),uploadController.singleUpload);
 uploadRouter.route('/singleUploadId').post(authService.ensureAuthenticated,upload.single('file'),uploadController.singleUploadId);
 uploadRouter.route('/deleteUpload').post(authService.ensureAuthenticated,uploadController.deleteUpload);
+uploadRouter.route('/getImages').get(authService.ensureAuthenticated,uploadController.getImages);
 
 
 

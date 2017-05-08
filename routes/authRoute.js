@@ -11,7 +11,7 @@ var bcrypt = require('bcrypt-nodejs');
 var User = models.User;
 var facebookAuth = require('../services/facebookAuth.js');
 var googleAuth = require('../services/googleAuth.js');
-
+var nativeGoogleAuth = require('../services/nativeGoogle.js');
 var createJWT = require('../services/jwtService.js');
 
 
@@ -21,6 +21,8 @@ authenticateRouter.route('/auth/facebook')
 
 authenticateRouter.route('/auth/google')
 	.post(googleAuth);
+authenticateRouter.route('/auth/nativeGoogle')
+	.post(nativeGoogleAuth);
 
 authenticateRouter.route('/user/:userId')
 	.get(function(req, res) {

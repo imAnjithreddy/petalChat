@@ -1,7 +1,5 @@
 'use strict';
 var mongoose = require('mongoose');
-
-var URLSlugs = require('mongoose-url-slugs');
 var mongoosePaginate = require('mongoose-paginate');
 var relationship = require("mongoose-relationship"); //Refer https://www.npmjs.com/package/mongoose-relationship
 var Schema = mongoose.Schema;

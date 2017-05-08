@@ -49,6 +49,7 @@ function getFilteredPosts(req,res,options,queryObj){
         });
 }
 function getPosts(req,res){
+        console.log("hitting hitting");
         var queryObj = {};
         var options = {};
         options.limit = req.query.limit ? parseInt(req.query.limit) : 20;

@@ -160,7 +160,6 @@ function getUsers(req,res){
 		    }
         //options.populate = req.query.populate || null;
 }
-
 function generateUserObj(item,existingUser){
   
   var user = existingUser || new User();  
@@ -220,7 +219,6 @@ function createUser(req, res) {
 
 
 }
-
 function getUser(req, res) {
   
   if(req.user == req.params.id){
@@ -242,7 +240,6 @@ function getUser(req, res) {
   }
   
 }
-
 function revealedUser(id,res){
   User.findById(id)
     .then(function(result) {
@@ -279,7 +276,6 @@ function updateUser(req, res) {
     
   });
 }
-
 function deleteUser(req, res) {
 
   User.findById(req.params.userId, function(err, user) {
@@ -296,28 +292,3 @@ function deleteUser(req, res) {
 module.exports = userController;
 
 
-
-
-
-
-  /*
-              var userInterest = [];
-              var userInterestQueryObj = [];
-              for (let interest in userInterest) {
-                let interestObject = {};
-                interestObject['interest'] = userInterest[interest];
-                userInterestQueryObj.push(interestObject);
-              }
-              queryObj.$or = userInterestQueryObj;*/
- /*User.findById(req.user).select('revealed').then(function(revealedList){
-            queryObj['_id'] = { "$in": revealedList };  
-            
-            if(req.query.userSearch){
-              var userRe = new RegExp(req.query.userSearch.toLowerCase(), "i");
-              queryObj.$or = [{ 'firstName': { $regex: userRe }}, { 'lastName': { $regex: userRe }},{ 'displayName': { $regex: userRe }}];
-            }
-            
-            User.paginate(queryObj, options).then(function(userList) {
-              res.json(userList);
-            });
-          });*/

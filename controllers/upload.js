@@ -1,11 +1,8 @@
 'use strict';
-var express = require('express');
-var app = express();
+
+
 
 var cloudinary = require('cloudinary').v2;
-var multer = require('multer');
-var upload = multer({ dest: './uploads/'});
-
 
 cloudinary.config({
     cloud_name: 'shoppingdirectory',
@@ -17,7 +14,8 @@ var uploadController = {
   singleUpload: singleUpload,
   multipleUpload: multipleUpload,
   deleteUpload: deleteUpload,
-  singleUploadId: singleUploadId
+  singleUploadId: singleUploadId,
+  getImages: getImages
 };
 
 function deleteUpload(req,res){
@@ -69,6 +67,54 @@ function multipleUpload(req, res){
               }
             });
   }
+ }
+ function callAPI(client,res){
+   client.search().images(10).withPhrase("enjoy")
+        .execute(function(err, response) {
+            if(err){
+                console.log(err);
+            }
+            var images = response.images;
+            var imageURL =[]; 
+            for(var i=0; i<images.length;i++){
+                //console.log(images[i].display_sizes);
+                for (var j = 0; j < images[i].display_sizes.length; j++) {
+                     imageURL.push(images[i].display_sizes[j].uri);
+                }
+            }
+            return res.json(imageURL);
+        });
+ }
+ function getImages(req,res){
+    var api = require("gettyimages-api");
+    var creds = { apiKey: "jr566bffbcrcs2egf85axr4u", apiSecret: "yDN3mArxDMEa3JUBrgSwxrJPPa6nYspKBdx5ByGSJEfux", username: "imAnjithreddy", password: "Anudeep_909" };
+    var client = new api (creds);
+    console.log("hit here");
+    console.log(req.query);
+    client.search().images(10).withPhrase(req.query.imageText||'happy')
+        .execute(function(err, response) {
+            if(err){
+                console.log(err);
+            }
+           // console.log(Object.keys(response.images[0]));
+            //console.log(JSON.stringify(response.images));
+            var images = response.images;
+            var imageURL =[]; 
+            for(var i=0; i<images.length;i++){
+                //console.log(images[i].display_sizes);
+                for (var j = 0; j < images[i].display_sizes.length; j++) {
+                     imageURL.push(images[i].display_sizes[j].uri);
+                }
+            }
+            if(imageURL.length){
+              return res.json(imageURL);  
+            }
+            else{
+              callAPI(client,res);
+            }
+            
+        });
+   
  }
 
 module.exports = uploadController;

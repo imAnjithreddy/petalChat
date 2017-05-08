@@ -1,13 +1,7 @@
 'use strict';
 var mongoose = require('mongoose');
-var bcrypt = require('bcrypt-nodejs');
-var URLSlugs = require('mongoose-url-slugs');
 var mongoosePaginate = require('mongoose-paginate');
-var relationship = require("mongoose-relationship"); //Refer https://www.npmjs.com/package/mongoose-relationship
 var Schema = mongoose.Schema;
-
-//var connectionString = "mongodb://shopdb:shopdb1234@ds029476.mlab.com:29476/shopdb";
-//var connectionString  = "mongodb://shop_dir:shop_dir@ds023912.mlab.com:23912/shoppins";
 
 var ChatRoomSchema = new Schema({
 	creator1: { type: Schema.ObjectId, ref: "User" },

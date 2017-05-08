@@ -58,7 +58,8 @@ function sendNotification(userId,notificationMessage){
                 console.log("********line 35 notfication *******");
                 console.log(err);
             }
-            
+            console.log("notification sent");
+            console.log(result);
         });
     });
 }

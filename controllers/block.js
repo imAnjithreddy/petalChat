@@ -75,9 +75,6 @@ function getBlock(req, res) {
     });
     
 }
-function getBlockLocal(){
-  
-}
 
 
 function deleteBlock(req, res) {

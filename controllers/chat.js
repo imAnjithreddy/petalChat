@@ -5,7 +5,6 @@ var notificationController = require('..//controllers/notification');
 var Chat = chatModel.Chat;
 var ChatRoom = chatRoomModel.ChatRoom;
 
-
 var chatController = {
     getChats: getChats,
     createChat: createChat,
@@ -130,27 +129,10 @@ function sendMessage(req,res,message,senderRoom,receiverID,receiverRoom){
             console.log(err);
             return res.json({message:err});
         }
-        
-        
-        
         req.io.to(senderRoom).emit('messageSaved', popMessage);
         req.io.to(receiverRoom._id).emit('messageReceived',popMessage);
         req.io.to(receiverID).emit('newMessageReceived', popMessage);
-        var userOnline;
-        try{
-            /*for (var i in req.io.sockets.adapter.rooms) {
-                if(i==receiverID){
-                    userOnline = true;
-                }
-            } */   
-        }
-        catch(err){
-            console.log(err);
-        }
-        if(!userOnline){
-            notificationController.sendMessageNotification(receiverID,popMessage);    
-        }
-        
+        notificationController.sendMessageNotification(receiverID,popMessage);    
         res.json({ message: message });
     });
 }
