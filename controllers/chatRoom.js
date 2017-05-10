@@ -14,10 +14,16 @@ var chatRoomController = {
 
 
 function deleteChatRoom(req,res){
-    console.log("entered delete chatroom");
-    console.log(req.params);
+    
     ChatRoom.findOne({_id:req.params.id}).then(function(chatRoom){
         if(chatRoom){
+            Chat.find({chatRoom:req.params.id}).then(function(chatRooms){
+                        let arrLength = chatRooms.length;
+                        for (let i = 0; i < arrLength; i++) {
+                            chatRooms[i].remove();
+                        }
+                    });
+            res.json("deleted chatRoom"); /*
             chatRoom.remove(function(err,errdeletedRoom){
                 if(err){
                     console.log("error while dlete chatroom");
@@ -33,7 +39,7 @@ function deleteChatRoom(req,res){
                     res.json("deleted chatRoom");    
                 }
                 
-            });
+            });*/
         }
     });
 }
