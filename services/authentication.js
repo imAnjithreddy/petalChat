@@ -3,7 +3,7 @@ var moment = require('moment');
 
 var jwt = require('jwt-simple');
 var config = require('../config');
-
+var User = require('..//models/user').User;
 let cob = {
     
 };
@@ -24,8 +24,12 @@ cob.ensureAuthenticated = function ensureAuthenticated(req, res, next) {
     if (payload.exp <= moment().unix()) {
         return res.status(401).send({ message: 'Token has expired' });
     }
-    req.user = payload.sub;
-    next();
+    //req.user = payload.sub;
+     User.findById(payload.sub._id).then(function(foundUser){
+       req.user = foundUser;
+       next();
+    });
+    
 };
 
 module.exports = cob;
