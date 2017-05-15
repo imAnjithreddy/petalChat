@@ -24,9 +24,9 @@ cob.ensureAuthenticated = function ensureAuthenticated(req, res, next) {
     if (payload.exp <= moment().unix()) {
         return res.status(401).send({ message: 'Token has expired' });
     }
-    //req.user = payload.sub;
+    req.user = payload.sub;
      User.findById(payload.sub._id).then(function(foundUser){
-       req.user = foundUser;
+       //req.user = foundUser;
        next();
     });
     
