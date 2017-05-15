@@ -17,13 +17,7 @@ var config = require('./config');
 require('dotenv').config();
 
     app.set('dbUrl', process.env.DB_URL);
-    console.log("checked");
-    console.log(process.env.GOOGLE_SEC);
-    console.log(process.env.FACEBOOK_SEC);
-    console.log(process.env.PIXABAY_SEC);
-    console.log(process.env.TOKEN_SEC);
-    console.log(process.env.PUSH_SEC);
-    console.log(app.get('dbUrl'));
+    
   //app.set('dbUrl', config.db[app.settings.env]);
   // connect mongoose to the mongo dbUrl
 

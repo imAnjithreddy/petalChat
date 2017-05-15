@@ -4,6 +4,9 @@ var moment = require('moment');
 var jwt = require('jwt-simple');
 var config = require('../config');
 var User = require('..//models/user').User;
+require('dotenv').config();
+
+
 let cob = {
     
 };
@@ -16,7 +19,7 @@ cob.ensureAuthenticated = function ensureAuthenticated(req, res, next) {
     var payload = null;
     try {
         
-        payload = jwt.decode(token, config.secret.token);
+        payload = jwt.decode(token, process.env.TOKEN_SEC);
     } catch (err) {
         return res.status(401).send({ message: err.message });
     }

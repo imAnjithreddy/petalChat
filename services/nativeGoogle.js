@@ -5,6 +5,7 @@ var models = require('..//models/user');
 var User = models.User;
 var createJWT = require('./jwtService.js');
 var config = require('../config');
+require('dotenv').config();
 function printReq(req,strings){
     console.log(strings);
     console.log(req.body);
@@ -23,7 +24,7 @@ module.exports = function(req,res){
             return res.status(409).send({ message: 'There is already a Google account that belongs to you' });
           }
           var token = req.header('Authorization').split(' ')[1];
-          var payload = jwt.decode(token, config.secret.token);
+          var payload = jwt.decode(token, process.env.TOKEN_SEC);
           User.findById(payload.sub, function(err, user) {
             if(err){
               console.log(err);

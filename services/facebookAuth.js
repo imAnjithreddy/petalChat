@@ -6,6 +6,11 @@ var models = require('..//models/user');
 var User = models.User;
 var createJWT = require('./jwtService.js');
 var config = require('../config');
+require('dotenv').config();
+
+    
+
+
 let userArray = [
   "Best_Name_Ever",
   "PrettyinPink",
@@ -249,11 +254,10 @@ let userArray = [
   "Couldnt_Find_Good_Name"
 ];
 
-//shopuae
-//var clientSecret = '34684e0d31a4f347e54e4a53dbbd5af4';
 
-//shoppinss
-var clientSecret = config.secret.facebook;
+
+
+var clientSecret = process.env.FACEBOOK_SEC;
 module.exports =  function(req, res) {
   
   var fields = ['id', 'email', 'first_name', 'last_name', 'link', 'name'];
@@ -290,7 +294,7 @@ module.exports =  function(req, res) {
             return res.status(409).send({ message: 'There is already a Facebook account that belongs to you' });
           }
           var token = req.header('Authorization').split(' ')[1];
-          var payload = jwt.decode(token, config.secret.token);
+          var payload = jwt.decode(token, process.env.TOKEN_SEC);
           User.findById(payload.sub, function(err, user) {
             if (!user) {
               return res.status(400).send({ message: 'User not found' });

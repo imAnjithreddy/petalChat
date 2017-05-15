@@ -7,6 +7,9 @@ var config = require('../config');
 var User = models.User;
 var createJWT = require('./jwtService.js');
 
+require('dotenv').config();
+
+    
 
 module.exports = function(req, res) {
   var accessTokenUrl = 'https://accounts.google.com/o/oauth2/token';
@@ -14,7 +17,7 @@ module.exports = function(req, res) {
   var params = {
     code: req.body.code,
     client_id: req.body.clientId,
-    client_secret: config.secret.google,
+    client_secret: process.env.GOOGLE_SEC,
     redirect_uri: req.body.redirectUri,
     grant_type: 'authorization_code'
   };
@@ -41,7 +44,7 @@ module.exports = function(req, res) {
           }
           var token = req.header('Authorization').split(' ')[1];
           
-          var payload = jwt.decode(token, config.secret.token);
+          var payload = jwt.decode(token, process.env.TOKEN_SEC);
           User.findById(payload.sub, function(err, user) {
             if(err){
               console.log("error in lne 44-");

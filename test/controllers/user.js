@@ -44,6 +44,9 @@ describe('Users',()=>{
             .post('/user/create')
             .send({user:sampleUser})
             .end((err,res)=>{
+                if(err){
+                    console.log(err);
+                }
                 expect(res.status).to.equal(200);
                 //expect(res.body).to.have.property('_id');
                /* expect(res.body.email).to.equal('first_last@mail.com');
