@@ -31,7 +31,6 @@ if (app.get('env') === 'production') {
     protocol == 'https' ? next() : res.redirect('https://' + req.hostname + req.url);
   });
 }
-var cityRouter = require('./routes/city');
 var upvoteRouter = require('./routes/upvoteRoute');
 var chatRouter = require('./routes/chatRoute');
 var chatRoomRouter = require('./routes/chatRoomRoute');
@@ -56,7 +55,6 @@ app.use('/block',blockRouter);
 app.use('/upvote',upvoteRouter);
 app.use('/reveal',revealRouter);
 app.use('/authenticate',authenticateRouter);
-app.use('/city',cityRouter);
 app.use('/upload',uploadRouter);
 app.use('/post',postRouter);
 app.use('/notification',notificationRouter);
