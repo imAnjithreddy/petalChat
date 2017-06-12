@@ -91,7 +91,7 @@ function multipleUpload(req, res){
     var client = new api (creds);
     console.log("hit here");
     console.log(req.query);
-    client.search().images(10).withPhrase(req.query.imageText||'happy')
+    client.search().images(10).withPhrase(req.query.imageText||'happy').withResponseField('display_set')
         .execute(function(err, response) {
             if(err){
                 console.log(err);

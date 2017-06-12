@@ -6,7 +6,7 @@ var defaults = {
     friendshipModelName:        'Friendship',
     // define the name of the Friendship collection.
     friendshipCollectionName:   undefined
-}
+};
 var mongoose = require('mongoose');
 
 var mongoosePaginate = require('mongoose-paginate');

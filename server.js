@@ -33,7 +33,9 @@ if (app.get('env') === 'production') {
 }
 var upvoteRouter = require('./routes/upvoteRoute');
 var chatRouter = require('./routes/chatRoute');
+var messageRouter = require('./routes/messageRoute');
 var chatRoomRouter = require('./routes/chatRoomRoute');
+var messageRoomRouter = require('./routes/messageRoomRoute');
 var authenticateRouter = require('./routes/authRoute');
 var postRouter = require('./routes/postRoute');
 var userRouter = require('./routes/userRoute');
@@ -64,8 +66,10 @@ app.use(function(req, res, next) {
     next();
 });
 app.use('/chat', chatRouter);
-app.use('/chatRoom', chatRoomRouter);
 
+app.use('/chatRoom', chatRoomRouter);
+app.use('/message', messageRouter);
+app.use('/messageRoom', messageRoomRouter);
 app.get('*', function (req, res) {
         res.sendFile(__dirname + '/client/index.html'); // load the single view file (angular will handle the page changes on the front-end)
 });
@@ -79,6 +83,11 @@ io.on('connection', function(socket) {
     socket.on('addToSingleRoom', function(singleRoom) {
         console.log("joined the room singleroom");
         socket.join(singleRoom.roomId);
+    });
+    socket.on('addToMessagetRoom',function(messageRoom){
+        console.log("joined the message room");
+        console.log(messageRoom);
+        socket.join(messageRoom.roomId);
     });
     socket.on('removeFromRoom', function(room) {
         console.log("left room");
