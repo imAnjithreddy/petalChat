@@ -178,14 +178,15 @@ function updatePost(req, res) {
 }
 
 function deletePost(req, res) {
-
-  Post.findById(req.params.postId, function(err, post) {
-    if (err) {
-      console.log(err);
-    }
-    else {
-      res.json({"message":"Post has been deleted"});
-    }
+  Post.findById(req.params.postId).then( function(post) {
+      
+      if(post && post.user==req.user){
+        post.remove().then(function(deletedPost){
+          res.json({"message":"Post has been deleted","deletePost":deletedPost});    
+        });
+      }
+      
+    
   });
 }
 
