@@ -191,7 +191,7 @@ function generateUserObj(item,existingUser){
   }
   if(item.hasOwnProperty('interests')){
     if(item.interests.length>0){
-      user.interests = item.interests.split('!');
+      user.interests = item.interests.split('#');
     user.interests.splice(0,1);
     user.interests = user.interests.map((interest)=>interest.trim());  
     }
