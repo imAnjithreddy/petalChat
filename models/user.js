@@ -39,8 +39,8 @@ var UserSchema = new Schema({
 	"requested": [{ type: Schema.ObjectId, ref: "User" }],
 	"received": [{ type: Schema.ObjectId, ref: "User" }],
 	"revealed":[{ type: Schema.ObjectId, ref: "User" }],
-	"posts": [{ type: Schema.ObjectId, ref: "Post" }]
-
+	"posts": [{ type: Schema.ObjectId, ref: "Post" }],
+	"city": {type:String}
 }, { collection: 'users' });
 UserSchema.methods.toJSON = function() {
 	var user = this.toObject();

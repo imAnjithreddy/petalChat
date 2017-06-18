@@ -6,7 +6,8 @@ var messageRoomModel = require('..//models/messageRoom');
 var MessageRoom = messageRoomModel.MessageRoom;
 var messageRoomController = {
     getMessageRoom: getMessageRoom,
-    getMessageRooms: getMessageRooms
+    getMessageRooms: getMessageRooms,
+    leaveMessageRoom: leaveMessageRoom
     
 };
 
@@ -77,6 +78,25 @@ function getMessageRooms(req, res) {
             
         });
 }
-   
+
+function leaveMessageRoom(req, res){
+    console.log("entered message room");
+    console.log(req.body);
+    if(req.body.messageRoomId){
+        MessageRoom.findById(req.body.messageRoomId).then(function(messageRoom){
+            let users = messageRoom.users;
+            let userIndex = users.indexOf(req.user);
+            if(userIndex!==-1){
+                users.splice(userIndex,1);
+                messageRoom.users = users;
+                messageRoom.save().then(function(messageRoomSaved){
+                    res.json({"Message":"Removed from group"});
+                }).catch(function(err){
+                    res.json({"Message":err});
+                });
+            }
+        });
+    }
+}
    
 module.exports = messageRoomController;

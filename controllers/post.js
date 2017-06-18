@@ -29,6 +29,7 @@ function getNearByPosts(req,res,options,queryObj){
   let maxDistance = (req.query.distance||18)*100;
     			maxDistance /= 6371;
     			queryObj.loc = { $ne: null };
+    			options.sort = '-time';
     			queryObj.loc={
     				$near: [req.query.longitude,req.query.latitude],
     				$maxDistance: maxDistance
@@ -49,7 +50,7 @@ function getFilteredPosts(req,res,options,queryObj){
         });
 }
 function getPosts(req,res){
-        console.log("hitting hitting");
+        
         var queryObj = {};
         var options = {};
         options.limit = req.query.limit ? parseInt(req.query.limit) : 20;

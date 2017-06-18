@@ -185,8 +185,6 @@ function generateUserObj(item,existingUser){
     user.anonName = item.anonName;
   }
   if(item.latitude && item.longitude){
-    console.log("the latitude and longitude");
-    console.log(item.latitude+"::"+item.longitude);
     user.loc = [item.longitude,item.latitude];  
   }
   if(item.hasOwnProperty('interests')){
