@@ -9,7 +9,9 @@ var MessageRoomSchema = new Schema({
 	messages: [{ type: Schema.ObjectId, ref: "Message" }],
 	lastMessage: { type: Schema.ObjectId, ref: "Message" },
 	lastMessageTime: { type: Date },
-	users: [{type: Schema.ObjectId, ref:"User"}]
+	users: [{type: Schema.ObjectId, ref:"User"}],
+	adminUser: {type: Schema.ObjectId, ref:"User"},
+	messageRoomImage: {type: String}
 
 });
 

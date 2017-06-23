@@ -91,14 +91,16 @@ function multipleUpload(req, res){
     var client = new api (creds);
     console.log("hit here");
     console.log(req.query);
+    var randomImages = ['https://www.newton.ac.uk/files/covers/968361.jpg','https://1.bp.blogspot.com/_IY7CmWJmPL4/R8K5bFaKXpI/AAAAAAAABO0/fH7E6kPibuM/S1600-R/random.jpg','http://cdn.playbuzz.com/cdn/feafe379-c083-4bd5-ab56-b803834fbb01/099c879d-4909-49ad-a941-73a57ff1dc35.jpg','https://i.redd.it/5uyrc8opy9uy.jpg']
     client.search().images(10).withPhrase(req.query.imageText||'happy').withResponseField('display_set')
         .execute(function(err, response) {
             if(err){
+              console.log("error found getty");
                 console.log(err);
             }
            // console.log(Object.keys(response.images[0]));
             //console.log(JSON.stringify(response.images));
-            var images = response.images;
+            var images = response.images||randomImages;
             var imageURL =[]; 
             for(var i=0; i<images.length;i++){
                 //console.log(images[i].display_sizes);

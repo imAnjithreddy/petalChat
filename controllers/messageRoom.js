@@ -7,7 +7,9 @@ var MessageRoom = messageRoomModel.MessageRoom;
 var messageRoomController = {
     getMessageRoom: getMessageRoom,
     getMessageRooms: getMessageRooms,
-    leaveMessageRoom: leaveMessageRoom
+    leaveMessageRoom: leaveMessageRoom,
+    createMessageRoom: createMessageRoom,
+    getAllMessageRooms: getAllMessageRooms
     
 };
 
@@ -17,8 +19,11 @@ function getMessageRoom(req,res){
     if(req.query.interest){
         queryObj.interest = req.query.interest;
     }
-    else if(req.query.postId){
+    if(req.query.postId){
         queryObj.post = req.query.postId;
+    }
+    if(req.query.roomId){
+        queryObj._id = req.query.roomId;
     }
     
     MessageRoom.findOne(queryObj).populate('post','content').select('-messages').then(function(foundMessageRoom){
@@ -37,7 +42,7 @@ function getMessageRoom(req,res){
             if(req.query.interest){
                 newMessageRoom.interest = req.query.interest;
             }
-            else if(req.query.postId){
+            if(req.query.postId){
                 newMessageRoom.post = req.query.postId;
             }   
             newMessageRoom.save().then(function(savedMessageRoom){
@@ -58,7 +63,7 @@ function getMessageRooms(req, res) {
         var queryObj = {};
         var options = {};
         queryObj.users = req.user;
-        queryObj["messages.0"]= { "$exists": true };
+        //queryObj["messages.0"]= { "$exists": true };
         options.limit = req.query.limit ? parseInt(req.query.limit) : 20;
         options.sort = req.query.sort ||{
             lastMessageTime: -1 //Sort by Date Added DESC
@@ -72,6 +77,24 @@ function getMessageRooms(req, res) {
             { path: 'lastMessage', model: 'Message', select: 'message type user',populate:[{path:'user',model:'User',select:'anonName picture'}] },
             { path: 'post', model: 'Post', select: 'content image' }
         ];
+        
+        MessageRoom.paginate(queryObj, options).then(function(messageRooms) {
+            res.json(messageRooms);
+            
+        });
+}
+
+function getAllMessageRooms(req, res) {
+        
+        var queryObj = {};
+        var options = {};
+        queryObj["interest"]= { "$exists": true };
+        if(req.query.interest){
+            queryObj.interest = new RegExp(req.query.interest, 'i');
+        }
+        options.limit = req.query.limit ? parseInt(req.query.limit) : 20;
+        options.page = req.query.page || 1;
+        options.select = '-messages';
         
         MessageRoom.paginate(queryObj, options).then(function(messageRooms) {
             res.json(messageRooms);
@@ -99,4 +122,32 @@ function leaveMessageRoom(req, res){
     }
 }
    
+function createMessageRoom(req, res){
+    console.log("create message room");
+    console.log(req.body);
+    var messageRoomInterest = req.body.messageRoom.interest;
+    var messageRoomImage = req.body.messageRoom.messageRoomImage;
+    MessageRoom.findOne({interest: messageRoomInterest,adminUser:req.user})
+        .then(function(foundMessageRoom){
+            if(foundMessageRoom){
+                res.status(400).send({"Message":"MessageRoom already exists"});
+            }else{
+                var newMessageRoom = new MessageRoom();
+                newMessageRoom.adminUser = req.user;
+                newMessageRoom.users = [req.user];
+                newMessageRoom.interest = messageRoomInterest;
+                newMessageRoom.messageRoomImage = messageRoomImage;
+                newMessageRoom.save().then(function(savedMessageRoom){
+                    res.json({savedMessageRoom:savedMessageRoom});
+                }).catch(function(e){
+                    console.log("get message room new error");
+                    console.log(e);
+                });
+            }
+        }).catch(function(err){
+            console.log("error in finding message room");
+            console.log(err);
+            res.status(500).send({"Message":"Error in finding message room"});
+        });
+}
 module.exports = messageRoomController;
