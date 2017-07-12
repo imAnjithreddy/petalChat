@@ -107,7 +107,7 @@ function multipleUpload(req, res){
           }
         });
         imageURL = imageURL.concat(snaps);
-      }else{
+      }
         client.search().images(10).withPhrase(req.query.imageText||'happy').withResponseField('display_set')
         .execute(function(err, response) {
             if(err){
@@ -132,7 +132,7 @@ function multipleUpload(req, res){
             }
             
         });
-      }
+      
     });
     
    
