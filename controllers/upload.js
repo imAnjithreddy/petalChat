@@ -99,7 +99,7 @@ function multipleUpload(req, res){
       if(snaps.length){
         //return res.json(snaps); 
         snaps = snaps.filter(function(snap){
-          if(snap.indexOf('http')){
+          if(snap.indexOf('http')!=-1){
             return true;
           }
           else{
