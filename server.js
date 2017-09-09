@@ -22,7 +22,9 @@ require('dotenv').config();
   //app.set('dbUrl', config.db[app.settings.env]);
   // connect mongoose to the mongo dbUrl
 
-  mongoose.connect(app.get('dbUrl'));
+  mongoose.connect(app.get('dbUrl'),{
+      useMongoClient: true
+  });
 
 
 app.use(cors());
