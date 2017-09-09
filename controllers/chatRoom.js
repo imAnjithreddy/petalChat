@@ -79,15 +79,30 @@ function createOrFindChatRoom(firstUserID,secondUserID,callBack){
 }
 
 function updateChatRoom(req,res){
+    console.log("update chat");
+    console.log(req.params.id);
     ChatRoom.findById(req.params.id).then(function(chatRoom){
         chatRoom.lastLoggedOut = new Date();
         chatRoom.save(function(err,savedChatRoom){
             if(err){
                 return res.json(err);
             }
-            return res.json(savedChatRoom);
-        })
-    })
+            //return res.json(savedChatRoom);
+            var selectString = 'anonName picture';
+             ChatRoom.populate(savedChatRoom, [{ path: "creator2", select: selectString},{ path: "lastMessage"}], function(err, popChatRoom) {
+        if(err){
+            console.log(err);
+            return res.json({message:err});
+        }
+        console.log("got chatroom");
+        console.log(popChatRoom);
+        popChatRoom.chats = [];
+        res.json(popChatRoom);        
+    });
+            
+            
+        });
+    });
 }
 function getChatRoom(req,res){
     
@@ -96,12 +111,26 @@ function getChatRoom(req,res){
             return res.status(401).send({ message: "wrong access" });
         
     }
+    console.log("in create or find");
+    console.log(req.user);
+    console.log(req.params.user);
     createOrFindChatRoom(req.user,req.params.user,function(chatRoom){
             createOrFindChatRoom(req.params.user,req.user,function(chatRoom){
                 
             });
         
-        res.json(chatRoom);        
+        var selectString = 'anonName picture';
+        ChatRoom.populate(chatRoom, [{ path: "creator2", select: selectString},{ path: "lastMessage"}], function(err, popChatRoom) {
+        if(err){
+            console.log(err);
+            return res.json({message:err});
+        }
+        console.log("got chatroom");
+        console.log(popChatRoom);
+        popChatRoom.chats = [];
+        res.json(popChatRoom);        
+    });
+        
     });
 }
 
@@ -112,18 +141,15 @@ function getChatRooms(req, res) {
         queryObj.creator1 = creator;
         queryObj.revealed = false;
         queryObj["chats.0"]= { "$exists": true };
-        options.limit = req.query.limit ? parseInt(req.query.limit) : 20;
+        options.limit = req.query.limit ? parseInt(req.query.limit,10) : 20;''
         options.sort = req.query.sort ||{
         lastMessageTime: -1 //Sort by Date Added DESC
         };
         options.page = req.query.page || 1;
         options.select = '-chats';
-        var userSelectString = ' anonName picture ';
+        var userSelectString = 'anonName picture';
         
-        if(req.query.revealed=='true'){
-            queryObj.revealed = true;
-            userSelectString = 'displayName picture googlePicture facebookPicture googleName facebookName revealedPicture';
-        }
+        
         options.populate = [{ path: 'creator1', model: 'User', select: userSelectString },
                             { path: 'lastMessage', model: 'Chat', select: 'message type user' },
                             { path: 'creator2', model: 'User', select: userSelectString }

@@ -11,6 +11,7 @@ let cob = {
     
 };
 cob.ensureAuthenticated = function ensureAuthenticated(req, res, next) {
+    
     if (!req.header('authorization')) {
         return res.status(401).send({ message: 'Please make sure your request has an Authorization header' });
     }

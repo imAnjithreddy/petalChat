@@ -1,9 +1,10 @@
 
 var http = require('http');
-var io = require('socket.io');
 var express = require('express');
 var app = express();
 var server = http.createServer(app);
+var io = require('socket.io');//(server, {pingTimeout: 60000});
+
 io = io.listen(server);
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
@@ -41,6 +42,7 @@ var postRouter = require('./routes/postRoute');
 var userRouter = require('./routes/userRoute');
 var blockRouter = require('./routes/blockRoute');
 var uploadRouter = require('./routes/uploadRoute');
+var nativeAuthRouter = require('./routes/nativeAuth');
 var revealRouter = require('./routes/revealRoute');
 var notificationRouter = require('./routes/notificationRoute');
 
@@ -59,6 +61,7 @@ app.use('/reveal',revealRouter);
 app.use('/authenticate',authenticateRouter);
 app.use('/upload',uploadRouter);
 app.use('/post',postRouter);
+app.use('/nativeAuth',nativeAuthRouter);
 app.use('/notification',notificationRouter);
 app.use(express.static(__dirname + '/public'));
 app.use(function(req, res, next) {
@@ -77,7 +80,8 @@ app.get('*', function (req, res) {
 io.on('connection', function(socket) {
     
     socket.on('addToChatRoom', function(room) {
-      
+      console.log("joined the room singleroom");
+        console.log(room);
         socket.join(room.roomId);
     });
     socket.on('addToSingleRoom', function(singleRoom) {

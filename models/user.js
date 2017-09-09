@@ -1,46 +1,40 @@
 'use strict';
-var defaults = {
-    // define the name for your Users model.
-    personModelName:            'User',
-    // define the name for the Friendship model
-    friendshipModelName:        'Friendship',
-    // define the name of the Friendship collection.
-    friendshipCollectionName:   undefined
-};
 var mongoose = require('mongoose');
 
 var mongoosePaginate = require('mongoose-paginate');
-var FriendsOfFriends = require('friends-of-friends')(mongoose,defaults);
+//profile: { device: '915cc30e4c98ec35'
+var autoIncrement = require('mongoose-auto-increment');
+autoIncrement.initialize(mongoose.connection);
 var Schema = mongoose.Schema;
 var UserSchema = new Schema({
 	'device_token': String,
-	"firstName": String,
-	"lastName": String,
+	'login_device_token': String,
+	"unique_id": {
+        type:String,
+        unique: true
+    },
 	"status": String,
 	"gender": { type: String, enum: ['Male', 'Female','Other'] },
 	"interests": [String],
 	"postInterests": [String],
 	"password": String,
-	"facebook": String,
-	"google": String,
-	'googleName': String,
-	'googlePicture': String,
-	'facebookName': String,
-	'facebookPicture': String,
 	"picture": { type: String, default: 'https://cdn3.iconfinder.com/data/icons/black-easy/512/538303-user_512x512.png' },
-	"displayName": String,
-	"revealedPicture": String,
 	"anonName": {type:String,default:'anonUser'},
 	"loc": {
     	type: [Number],  // [<longitude>, <latitude>]
-    	index: '2d'      // create the geospatial index
+    	index: '2d'      // create the geospatial inde
+    },
+    "age": {
+    	type: Number,
+    	default: 18
     },
     "upvotes": [{ type: Schema.ObjectId, ref: "Upvote"}],
-	"requested": [{ type: Schema.ObjectId, ref: "User" }],
-	"received": [{ type: Schema.ObjectId, ref: "User" }],
-	"revealed":[{ type: Schema.ObjectId, ref: "User" }],
 	"posts": [{ type: Schema.ObjectId, ref: "Post" }],
-	"city": {type:String}
+	"likes": [{ type: Schema.ObjectId, ref: "Post" }],
+	"city": {type:String},
+	"following": [{ type: Schema.Types.ObjectId, ref: "User" }],
+	"followers": [{ type: Schema.Types.ObjectId, ref: "User" }]
+	
 }, { collection: 'users' });
 UserSchema.methods.toJSON = function() {
 	var user = this.toObject();
@@ -51,8 +45,8 @@ UserSchema.methods.toJSON = function() {
 
 UserSchema.plugin(mongoosePaginate);
 
+UserSchema.plugin(autoIncrement.plugin, { model: 'User', field: 'userAutoId' });
 
-UserSchema.plugin(FriendsOfFriends.plugin,defaults);
 try{
 	exports.User = mongoose.model('User', UserSchema);
 }

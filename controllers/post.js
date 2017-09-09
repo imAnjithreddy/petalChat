@@ -1,16 +1,9 @@
 'use strict';
 
 var Post = require('..//models/post').Post;
+var User = require('..//models/user').User;
 
 
-
-var postController = {
-  createPost: createPost,
-  getPost: getPost,
-  updatePost: updatePost,
-  deletePost: deletePost,
-  getPosts: getPosts
-};
 
 function getLocation(req,error,callback){
         let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -195,6 +188,63 @@ function savePostViews(id){
   Post.findById(id).select('views').then(function(post){
     post.views=post.views+1;
     post.save();
-  })
+  });
 }
+const saveViewsPost=(req,res)=>{
+  savePostViews(req.params.postId);
+};
+const submitLike = async (req,res)=>{
+  try{
+    let foundPost = await Post.findById(req.params.postId);
+    let foundUser = await User.findById(req.user);
+    if(foundPost && foundUser){
+      foundPost.likes.push(req.user);
+      foundUser.likes.push(req.params.postId);
+      await foundPost.save();
+      await foundUser.save();
+      updateLikes(req.params.postId);
+      res.json({"Message": "Post liked"});
+    }
+  }catch(e){
+    console.log("error in submit like");
+    console.log(e);
+  }
+  
+};
+const deleteLike = async (req,res)=>{
+  try{
+    await Post.update( {_id: req.params.postId}, { $pullAll: {likes: [req.user] }} );
+    await User.update( {_id: req.user}, { $pullAll: {likes: [req.params.postId] }} );
+    updateLikes(req.params.postId);
+    res.json({"Message": "Post unliked"});
+    
+  }catch(e){
+    console.log("error in delete like");
+    console.log(e);
+  }
+  
+};
+const updateLikes = async (postId)=>{
+  try{
+    let foundPost = await Post.findById(postId);
+    if(foundPost){
+      
+      foundPost.likesLength = foundPost.likes.length;
+      foundPost.save();
+    }
+  }catch(e){
+    console.log("error in submit like");
+    console.log(e);
+  }
+};
+var postController = {
+  createPost: createPost,
+  getPost: getPost,
+  updatePost: updatePost,
+  deletePost: deletePost,
+  getPosts: getPosts,
+  submitLike: submitLike,
+  deleteLike: deleteLike,
+  saveViewsPost: saveViewsPost
+};
 module.exports = postController;

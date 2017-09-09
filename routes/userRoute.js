@@ -21,5 +21,7 @@ userRouter.route('/create').post(UserController.createUser);
 userRouter.route('/update').post(authService.ensureAuthenticated,UserController.updateUser);
 userRouter.route('/get/:id').get(authService.ensureAuthenticated,UserController.getUser);
 userRouter.route('/getUsers').get(authService.ensureAuthenticated,UserController.getUsers);
+userRouter.route('/follow/:userId').post(authService.ensureAuthenticated,UserController.submitFollowing);
+userRouter.route('/unfollow/:userId').post(authService.ensureAuthenticated,UserController.deleteFollowing);
 module.exports = userRouter;
 

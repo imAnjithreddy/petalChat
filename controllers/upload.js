@@ -15,20 +15,34 @@ var uploadController = {
   multipleUpload: multipleUpload,
   deleteUpload: deleteUpload,
   singleUploadId: singleUploadId,
-  getImages: getImages
+  getImages: getImages,
+  uploadBASE64: uploadBASE64
 };
 
 function deleteUpload(req,res){
   var public_id = req.body.data.public_id;
   
   cloudinary.uploader.destroy(public_id,function(err,result){
-    
+    if(err){
+      console.log("error in delete");
+      console.log(err);
+    }
     console.log("deleted");
     console.log(public_id);
     console.log(result);
     res.json(result);
   });
 }
+function uploadBASE64(req,res){
+  
+  cloudinary.uploader.upload("data:image/png;base64,"+req.body.imageString,function(reqc,resc){
+    var imgUrl = resc.url;
+    var  public_id = resc.public_id;
+    res.json({image:imgUrl,imageId:public_id});
+  });
+}
+
+
 function singleUploadId(req, res){
   var file = req.file;    
   
@@ -56,6 +70,7 @@ function multipleUpload(req, res){
   var imgArrayMin = [];
   var size = req.files.length;
   var counter = 0;
+  
   for(let i=0; i<size;i++){
     cloudinary.uploader.upload(req.files[i].path, { eager: [{ width: 112, height: 112, crop: "pad" }
              ]},function(reqc, resc) {
@@ -74,6 +89,7 @@ function multipleUpload(req, res){
             if(err){
                 console.log(err);
             }
+            
             var images = response.images;
             var imageURL =[]; 
             for(var i=0; i<images.length;i++){
@@ -94,7 +110,7 @@ function multipleUpload(req, res){
     var imageURL =[]; 
     var randomImages = ['https://www.newton.ac.uk/files/covers/968361.jpg','https://1.bp.blogspot.com/_IY7CmWJmPL4/R8K5bFaKXpI/AAAAAAAABO0/fH7E6kPibuM/S1600-R/random.jpg','http://cdn.playbuzz.com/cdn/feafe379-c083-4bd5-ab56-b803834fbb01/099c879d-4909-49ad-a941-73a57ff1dc35.jpg','https://i.redd.it/5uyrc8opy9uy.jpg'];
     var stocksnap = require('stocksnap.io');
-    stocksnap(req.query.imageText, {highres: false, sort: 'downloads', shuffle: true, pages: 1}, function (snaps) {
+    stocksnap(req.query.imageText, {highres: false, sort: 'downloads', shuffle: true, pages: 2}, function (snaps) {
       console.log('Oddly specific apple query', snaps);
       if(snaps.length){
         //return res.json(snaps); 

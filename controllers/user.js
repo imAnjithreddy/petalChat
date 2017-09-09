@@ -2,14 +2,15 @@
 
 var User = require('..//models/user').User;
 
-var mongoose = require('mongoose');
 
-var userController = {
-  createUser: createUser,
-  getUser: getUser,
-  updateUser: updateUser,
-  deleteUser: deleteUser,
-  getUsers: getUsers
+const saveUserLocation = (req)=>{
+  console.log("called save user");
+  User.findById(req.user).then((foundUser)=>{
+            if(foundUser){
+              foundUser.loc = [req.query.longitude,req.query.latitude];  
+              foundUser.save();
+            }
+    });
 };
 function getLocation(req,error,callback){
         let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -74,61 +75,20 @@ function getNearByUsers(req,res,options,queryObj){
 function getUsers(req,res){
         var queryObj = {};
         var options = {};
-        options.limit = req.query.limit ? parseInt(req.query.limit) : null;
+        options.limit = req.query.limit ? parseInt(req.query.limit,10) : null;
         options.sort = req.query.sort || null;
         options.page = req.query.page || null;
         options.select = 'anonName status picture loc interests gender';    
         
-        if(!!req.query.revealed){
-          User.getFriends(mongoose.Types.ObjectId(req.user),function(err,list){
-            if(err){
-              console.log(err);
-            }
-              return res.json(sliceUsers(options.page,options.limit,list));
-          });
-         
-           
-        }
-        else if(req.query.received ){
-          User.getReceivedRequests(mongoose.Types.ObjectId(req.user),function(err,list){
-            if(err){
-              console.log(err);
-            }
-            
-           
-              return res.json(sliceUsers(options.page,options.limit,list,'received'));
-          });
-          
-        }
-        else if(req.query.requested){
-          User.getSentRequests(mongoose.Types.ObjectId(req.user),function(err,list){
-            if(err){
-              console.log(err);
-            }
-              return res.json(sliceUsers(options.page,options.limit,list,'requested'));
-          });
-          
-        }
-        else if(req.query.all){
+        if(req.query.all){
             if(req.query.interest){
-             queryObj.interests = new RegExp(req.query.interest.toLowerCase(), "i");
+             queryObj.$or =  [
+               {interests: new RegExp(req.query.interest.toLowerCase(), "i") },
+              {anonName: new RegExp(req.query.interest.toLowerCase(), "i") }
+              ];
             }
-            let randomSort = 4;//Math.floor(Math.random() * 5) + 1;
-            if(randomSort==1){
-              options.sort='-facebookName';
-            }
-            else if(randomSort==2){
-              options.sort='facebookName';
-            }
-            else if(randomSort==3){
-              options.sort='anonName';
-            }
-            else if(randomSort==4){
-              options.sort='facebook';
-            }
-            else if(randomSort==5){
-              options.sort='-facebook';
-            }
+            options.sort='anonName';
+            
             User.paginate(queryObj, options).then(function(userList) {
               return res.json(userList);
             });
@@ -142,6 +102,11 @@ function getUsers(req,res){
       				$near: [req.query.longitude,req.query.latitude],
       				$maxDistance: maxDistance
       			};
+      			console.log("options page");
+      			console.log(options.page);
+      			if(options.page == 1){
+              saveUserLocation(req);
+            }
       			User.paginate(queryObj, options).then(function(userList) {
       			    userList.time = new Date();
                 res.json(userList);
@@ -153,12 +118,15 @@ function getUsers(req,res){
     			  },function(location){
     			    req.query.longitude = location.longitude;
     			    req.query.latitude = location.latitude;
+    			    if(options.page == 1){
+              saveUserLocation(req);
+            }
     			    getNearByUsers(req,res,options,queryObj);
     			  });
           }
           
 		    }
-        //options.populate = req.query.populate || null;
+        
 }
 function generateUserObj(item,existingUser){
   
@@ -168,7 +136,10 @@ function generateUserObj(item,existingUser){
   
   
   if(item.picture){
-    user.picture = item.picture;  
+    if(item.picture.startsWith("http")){
+      user.picture = item.picture;    
+    }
+    
   }
   
   if(item.gender){
@@ -183,6 +154,10 @@ function generateUserObj(item,existingUser){
   
   if(item.anonName){
     user.anonName = item.anonName;
+  }
+  
+  if(item.age){
+    user.age = item.age;
   }
   if(item.latitude && item.longitude){
     user.loc = [item.longitude,item.latitude];  
@@ -223,17 +198,9 @@ function getUser(req, res) {
     revealedUser(req.user,res);
   }
   else{
-    User.areFriends( mongoose.Types.ObjectId(req.user),  mongoose.Types.ObjectId(req.params.id),function(err,friends){
-      if(err){
-        console.log(err);
-      }
-      if(friends){
-          revealedUser(req.params.id,res);
-        }
-        else{
-          anonUser(req.params.id,res);
-        }
-    });
+    console.log("anon user");
+    anonUser(req.params.id,res);
+    
       
   }
   
@@ -246,7 +213,8 @@ function revealedUser(id,res){
 }
 function anonUser(id,res){
   User.findById(id)
-    .select('-facebook -google -facebookName -facebookPicture -googleName -googlePicture -revealedPicture').then(function(result) {
+    .select(' -revealedPicture').then(function(result) {
+        
         return res.json(result);
     });  
 }
@@ -285,7 +253,73 @@ function deleteUser(req, res) {
     }
   });
 }
+function getMyFollowers(req,res){
+  User.find({following: req.user}).exec(function(err, users) { 
+    if(err){
+      
+    }
+    if(users){
+      res.json({followers: users});
+    }
+    
+  });
+}
+function getMyFollowing(req,res){
+  User.findById(req.user).populate({ path:'following'  }).exec(function(err, user) {
+  if (err) {
+    // handle err
+  }
+  if (user) {
+    res.json({following: user.following});
+     // user.following[] <-- contains a populated array of users you're following
+  }
+});
+}
 
+
+const submitFollowing = async (req,res)=>{
+  try{
+    let foundUser = await User.findById(req.user);
+    let foundUser2 = await User.findById(req.params.userId);
+    if(foundUser && foundUser2){
+      foundUser.following.push(req.params.userId);
+      foundUser2.followers.push(req.user);
+      await foundUser.save();
+      await foundUser2.save();
+      res.json({"Message": "User followed"});
+    }
+  }catch(e){
+    console.log("error in submit following");
+    console.log(e);
+  }
+  
+};
+const deleteFollowing = async (req,res)=>{
+  try{
+    await User.update( {_id: req.user}, { $pullAll: {following: [req.params.userId] } } );
+    await User.update( {_id: req.params.userId}, { $pullAll: {followers: [req.user] } } );
+    
+    res.json({"Message": "User unfollowed"});
+    
+  }catch(e){
+    console.log("error in delete following");
+    console.log(e);
+  }
+  
+};
+
+
+var userController = {
+  createUser: createUser,
+  getUser: getUser,
+  updateUser: updateUser,
+  deleteUser: deleteUser,
+  getUsers: getUsers,
+  getMyFollowers: getMyFollowers,
+  getMyFollowing: getMyFollowing,
+  submitFollowing: submitFollowing,
+  deleteFollowing: deleteFollowing
+};
 
 module.exports = userController;
 

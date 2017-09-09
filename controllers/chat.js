@@ -13,12 +13,13 @@ var chatController = {
 
 function getChats(req, res) {
         var queryObj = {};
+        const limit = req.query.limit ? parseInt(req.query.limit,10) : 10;
         let selectString = 'anonName picture';
         
         queryObj.chatRoom = req.params.roomID;
         
         var options ={};
-        options.limit = 15;//req.query.limit ? parseInt(req.query.limit) : 50;
+        options.limit = limit||10;
         options.sort = {
             time: -1
         };
@@ -49,6 +50,8 @@ function getChats(req, res) {
 function createChat(req, res) {
     
         var recData = req.body;
+        console.log("body cha");
+        console.log(recData);
         var receiver = recData.receiver;
         if(recData.receiver == req.user){
             return res.status(401).send({ message: "wrong access" });
@@ -68,21 +71,14 @@ function createChat(req, res) {
             saveChatRoom({_id:chat.chatRoom},savedMessage,()=>{});
             
             saveChatRoom({creator1: receiver,creator2: req.user},savedMessage,function(savedChatRoom){
-                
-                
                 chat2.chatRoom = savedChatRoom._id;
-                
                 chat2.save(function(err,savedChat2){
                     if(err){
                         console.log(err);
                     }
-                    
                     sendMessage(req,res,savedChat2,chat.chatRoom,receiver,savedChatRoom);
                 });
-                
-                    
             });
-            
         });
 }
 
@@ -90,7 +86,6 @@ function createChat(req, res) {
 function saveChatRoom(queryObj,message,callback){
     
     ChatRoom.findOne(queryObj,function(err1,chatRoom){
-        
         if(err1){
             console.log("err 89");
             console.log(err1);
@@ -110,7 +105,6 @@ function saveChatRoom(queryObj,message,callback){
             if(err){
                 console.log(err);
             }
-            
             if(callback){
                 callback(chatRoomSaved);    
             }
@@ -121,10 +115,8 @@ function saveChatRoom(queryObj,message,callback){
 
 function sendMessage(req,res,message,senderRoom,receiverID,receiverRoom){
     var selectString = 'anonName picture';
-    if(receiverRoom.revealed){
-        selectString = 'displayName facebookName googleName facebookPicture googlePicture  revealedPicture';
-    }
-    Chat.populate(message, { path: "user", select: selectString}, function(err, popMessage) {
+    
+    Chat.populate(message, [{ path: "user", select: selectString},{ path: "chatRoom", select: '-chats',populate:[{path:'creator2',select:selectString},{path:'lastMessage'}]}], function(err, popMessage) {
         if(err){
             console.log(err);
             return res.json({message:err});
@@ -132,6 +124,8 @@ function sendMessage(req,res,message,senderRoom,receiverID,receiverRoom){
         req.io.to(senderRoom).emit('messageSaved', popMessage);
         req.io.to(receiverRoom._id).emit('messageReceived',popMessage);
         req.io.to(receiverID).emit('newMessageReceived', popMessage);
+        console.log("popped message");
+        console.log(popMessage);
         notificationController.sendMessageNotification(receiverID,popMessage);    
         res.json({ message: message });
     });
