@@ -34,7 +34,7 @@ const deviceAuth = async (req,res)=>{
             if(user){
                 console.log("from already");
                 console.log(user);
-                res.json({token: createJWT(user)});  
+                res.json({token: createJWT(user),user:user});  
             }else{
                 throw new Error(USER_NOT_FOUND);    
             }
@@ -61,7 +61,7 @@ const createNewUser = async (req,res)=>{
         let savedUser = await user.save();    
         console.log("new user");
         console.log(savedUser);
-        res.json({token: createJWT(savedUser)}); 
+        res.json({token: createJWT(savedUser),user:user}); 
     }
     catch(err){
          if (err.code && err.code === 11000) {

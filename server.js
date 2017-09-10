@@ -104,6 +104,7 @@ io.on('connection', function(socket) {
         console.log("disconnected");
     });
 });
+
 server.listen(app.get('port'), function() {
         console.log("listeing on server");
     });

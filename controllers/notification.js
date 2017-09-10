@@ -81,4 +81,7 @@ function register(req,res){
         
     });    
 }
+
+
+
 module.exports = notificationController;

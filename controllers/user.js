@@ -162,6 +162,9 @@ function generateUserObj(item,existingUser){
   if(item.latitude && item.longitude){
     user.loc = [item.longitude,item.latitude];  
   }
+  if(item.device_token){
+    user.device_token = item.device_token;
+  }
   if(item.hasOwnProperty('interests')){
     if(item.interests.length>0){
       user.interests = item.interests.split('#');
