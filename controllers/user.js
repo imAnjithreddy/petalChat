@@ -84,7 +84,8 @@ function getUsers(req,res){
             if(req.query.interest){
              queryObj.$or =  [
                {interests: new RegExp(req.query.interest.toLowerCase(), "i") },
-              {anonName: new RegExp(req.query.interest.toLowerCase(), "i") }
+              {anonName: new RegExp(req.query.interest.toLowerCase(), "i") },
+              {unique_id: new RegExp(req.query.interest.toLowerCase(), "i")}
               ];
             }
             options.sort='anonName';
