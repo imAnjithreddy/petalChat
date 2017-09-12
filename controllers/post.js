@@ -3,6 +3,15 @@
 var Post = require('..//models/post').Post;
 var User = require('..//models/user').User;
 
+const saveUserLocation = (req)=>{
+  console.log("called save user");
+  User.findById(req.user).then((foundUser)=>{
+            if(foundUser){
+              foundUser.loc = [req.query.longitude,req.query.latitude];  
+              foundUser.save();
+            }
+    });
+};
 
 
 function getLocation(req,error,callback){
@@ -66,7 +75,7 @@ function getPosts(req,res){
     			  },function(location){
     			    req.query.longitude = location.longitude;
     			    req.query.latitude = location.latitude;
-    			    
+    			    saveUserLocation(req);
     			    getNearByPosts(req,res,options,queryObj);
     			    
     			  });
