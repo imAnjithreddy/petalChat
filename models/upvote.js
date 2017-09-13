@@ -17,6 +17,4 @@ UpvoteSchema.plugin(relationship, { relationshipPathName: 'user' });
 UpvoteSchema.plugin(relationship, { relationshipPathName: 'post' });
 
 var Upvote = mongoose.model("Upvote", UpvoteSchema);
-
-
 exports.Upvote = Upvote;

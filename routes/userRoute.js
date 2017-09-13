@@ -13,9 +13,6 @@ cloudinary.config({
     api_key: '967339527283183',
     api_secret: '74NXckYl9m1-O0_ZTU8U_qoIDfw'
 });
-
-
-
 //userRouter.route('/updateUser/:user_id').post(commons.ensureAuthenticated, userController.updateUser);
 userRouter.route('/create').post(UserController.createUser);
 userRouter.route('/update').post(authService.ensureAuthenticated,UserController.updateUser);
@@ -23,5 +20,7 @@ userRouter.route('/get/:id').get(authService.ensureAuthenticated,UserController.
 userRouter.route('/getUsers').get(authService.ensureAuthenticated,UserController.getUsers);
 userRouter.route('/follow/:userId').post(authService.ensureAuthenticated,UserController.submitFollowing);
 userRouter.route('/unfollow/:userId').post(authService.ensureAuthenticated,UserController.deleteFollowing);
+userRouter.route('/getFollowers').get(authService.ensureAuthenticated,UserController.getUserFollowers);
+userRouter.route('/getFollowing').get(authService.ensureAuthenticated,UserController.getUserFollowing);
 module.exports = userRouter;
 

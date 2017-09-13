@@ -70,17 +70,22 @@ function getPosts(req,res){
         else if(req.query.nearby){
     			
     			if(!req.query.latitude ){
+    			  console.log("if check");
     			  getLocation(req,function(err){
     			    console.log(err);
     			  },function(location){
     			    req.query.longitude = location.longitude;
     			    req.query.latitude = location.latitude;
-    			    saveUserLocation(req);
+    			     if(options.page == 1){
+              saveUserLocation(req);
+            }
+    			   
     			    getNearByPosts(req,res,options,queryObj);
     			    
     			  });
     			}
     			else{
+    			  console.log("next else");
     			  let maxDistance = (req.query.distance||18)*100;
       			maxDistance /= 6371;
       			queryObj.loc = { $ne: null };
@@ -132,8 +137,6 @@ function generatePostObj(user,item){
 function createPost(req, res) {
   
   var post = generatePostObj(req.user,req.body.post);
-  console.log("form the post");
-  console.log(post);
   post.save(function(error, result) {
     if (error) {
       console.log("error" + error);

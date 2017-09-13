@@ -6,7 +6,9 @@ var User = require('..//models/user').User;
 const saveUserLocation = (req)=>{
   console.log("called save user");
   User.findById(req.user).then((foundUser)=>{
+    console.log("found user");
             if(foundUser){
+              console.log(req.query.longitude,req.query.latitude);
               foundUser.loc = [req.query.longitude,req.query.latitude];  
               foundUser.save();
             }
@@ -257,8 +259,8 @@ function deleteUser(req, res) {
     }
   });
 }
-function getMyFollowers(req,res){
-  User.find({following: req.user}).exec(function(err, users) { 
+function getUserFollowers(req,res){
+  /*User.find({following: req.user}).exec(function(err, users) { 
     if(err){
       
     }
@@ -267,8 +269,19 @@ function getMyFollowers(req,res){
     }
     
   });
+  */
+  
+  User.findById(req.user).populate({ path:'followers'  }).exec(function(err, user) {
+  if (err) {
+    // handle err
+  }
+  if (user) {
+    res.json({followers: user.followers});
+     // user.following[] <-- contains a populated array of users you're following
+  }
+});
 }
-function getMyFollowing(req,res){
+function getUserFollowing(req,res){
   User.findById(req.user).populate({ path:'following'  }).exec(function(err, user) {
   if (err) {
     // handle err
@@ -319,8 +332,8 @@ var userController = {
   updateUser: updateUser,
   deleteUser: deleteUser,
   getUsers: getUsers,
-  getMyFollowers: getMyFollowers,
-  getMyFollowing: getMyFollowing,
+  getUserFollowers: getUserFollowers,
+  getUserFollowing: getUserFollowing,
   submitFollowing: submitFollowing,
   deleteFollowing: deleteFollowing
 };
