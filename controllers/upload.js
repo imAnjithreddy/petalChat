@@ -103,17 +103,18 @@ function multipleUpload(req, res){
  }
  function getImages(req,res){
     var api = require("gettyimages-api");
+    var emojiStrip = require('emoji-strip')
     var creds = { apiKey: "jr566bffbcrcs2egf85axr4u", apiSecret: "yDN3mArxDMEa3JUBrgSwxrJPPa6nYspKBdx5ByGSJEfux", username: "imAnjithreddy", password: "Anudeep_909" };
     var client = new api (creds);
-    console.log("hit here");
-    console.log(req.query);
+    
     var imageURL =[]; 
     var randomImages = ['https://www.newton.ac.uk/files/covers/968361.jpg','https://1.bp.blogspot.com/_IY7CmWJmPL4/R8K5bFaKXpI/AAAAAAAABO0/fH7E6kPibuM/S1600-R/random.jpg','http://cdn.playbuzz.com/cdn/feafe379-c083-4bd5-ab56-b803834fbb01/099c879d-4909-49ad-a941-73a57ff1dc35.jpg','https://i.redd.it/5uyrc8opy9uy.jpg'];
     var stocksnap = require('stocksnap.io');
-    stocksnap(req.query.imageText, {highres: false, sort: 'downloads', shuffle: true, pages: 2}, function (snaps) {
+    
+    
+    stocksnap(emojiStrip(req.query.imageText), {highres: false, sort: 'downloads', shuffle: true, pages: 2}, function (snaps) {
       console.log('Oddly specific apple query', snaps);
       if(snaps.length){
-        //return res.json(snaps); 
         snaps = snaps.filter(function(snap){
           if(snap.indexOf('http')!=-1){
             return true;
@@ -151,9 +152,6 @@ function multipleUpload(req, res){
       
     });
     
-   
  }
-
 module.exports = uploadController;
-
 

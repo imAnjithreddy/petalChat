@@ -81,7 +81,6 @@ function getUsers(req,res){
         options.sort = req.query.sort || null;
         options.page = req.query.page || null;
         options.select = 'anonName status picture loc interests gender';    
-        
         if(req.query.all){
             if(req.query.interest){
              queryObj.$or =  [
