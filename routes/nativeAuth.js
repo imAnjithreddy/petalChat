@@ -49,6 +49,7 @@ const deviceAuth = async (req,res)=>{
     }
     
 };
+const imageArray = ['https://cdn.pixabay.com/photo/2013/07/13/13/38/turtle-161281_960_720.png','https://cdn.pixabay.com/photo/2016/11/21/15/13/blue-1845901_960_720.jpg','https://c1.staticflickr.com/1/159/376591423_c0b3889fc6_b.jpg','https://cdn.pixabay.com/photo/2016/03/31/16/09/batman-1293525_960_720.jpg','https://static.pexels.com/photos/93596/pexels-photo-93596.jpeg','https://static.pexels.com/photos/120222/pexels-photo-120222.jpeg'];
 const createNewUser = async (req,res)=>{
     var user = new User();
     user.unique_id = generateUniqueID();
@@ -58,6 +59,7 @@ const createNewUser = async (req,res)=>{
         user.login_device_token = req.body.profile.device;
         user.gender = "Other";
         user.status = "Hi, I am new to Gossip";
+        user.picture = imageArray[Math.floor(Math.random() * 6) + 0];
         let savedUser = await user.save();    
         console.log("new user");
         console.log(savedUser);
