@@ -34,7 +34,8 @@ function deleteUpload(req,res){
   });
 }
 function uploadBASE64(req,res){
-  
+  console.log("upload image section");
+  console.log(req.body);
   cloudinary.uploader.upload("data:image/png;base64,"+req.body.imageString,function(reqc,resc){
     var imgUrl = resc.url;
     var  public_id = resc.public_id;

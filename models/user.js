@@ -29,6 +29,7 @@ var UserSchema = new Schema({
     	default: 18
     },
     "upvotes": [{ type: Schema.ObjectId, ref: "Upvote"}],
+    "comments": [{ type: Schema.ObjectId, ref: "Comment"}],
 	"posts": [{ type: Schema.ObjectId, ref: "Post" }],
 	"likes": [{ type: Schema.ObjectId, ref: "Post" }],
 	"city": {type:String},

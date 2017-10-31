@@ -18,6 +18,7 @@ var PostSchema = new Schema({
     		index: '2d'      // create the geospatial index
     	},
     upvotes: [{ type: Schema.ObjectId, ref: "Upvote"}],
+    comments: [{ type: Schema.ObjectId, ref: "Comment"}],
     likes: [{ type: Schema.Types.ObjectId, ref: "User" }],
     upvotesLength: { type: Number, default: 0 },
     likesLength: { type: Number, default: 0 },

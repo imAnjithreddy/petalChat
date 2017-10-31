@@ -55,7 +55,7 @@ function getPosts(req,res){
         
         var queryObj = {};
         var options = {};
-        options.limit = 50;//req.query.limit ? parseInt(req.query.limit) : 20;
+        options.limit = req.query.limit ? parseInt(req.query.limit) : 20;
         options.sort = req.query.sort || null;
         options.page = req.query.page || 1;
         
