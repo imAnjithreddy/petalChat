@@ -21,6 +21,7 @@ var PostSchema = new Schema({
     comments: [{ type: Schema.ObjectId, ref: "Comment"}],
     likes: [{ type: Schema.Types.ObjectId, ref: "User" }],
     upvotesLength: { type: Number, default: 0 },
+    commentsLength: {type: Number, default: 0 },
     likesLength: { type: Number, default: 0 },
     views: {type: Number, default: 0}
 });
