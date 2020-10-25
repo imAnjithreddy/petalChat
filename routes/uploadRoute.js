@@ -9,9 +9,9 @@ var uploadController = require('../controllers/upload');
 
 var authService = require('../services/authentication');
 cloudinary.config({
-    cloud_name: 'shoppingdirectory',
-    api_key: '967339527283183',
-    api_secret: '74NXckYl9m1-O0_ZTU8U_qoIDfw'
+    cloud_name: '123456',
+    api_key: '123456',
+    api_secret: '123456'
 });
 
 
